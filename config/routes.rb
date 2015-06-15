@@ -4,6 +4,17 @@ Rails.application.routes.draw do
     scope :v1 do
       mount_devise_token_auth_for 'User', at: 'auth'
     end
+
+    namespace :v1 do
+      # POST API
+      get 'posts' => 'posts#index'
+      post 'posts' => 'posts#create'
+      put 'posts/:id' => 'posts#update'
+      delete 'posts/:id' => 'posts#destroy'
+      get 'posts/search' => 'posts#search'
+
+    end
+
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

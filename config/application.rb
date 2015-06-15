@@ -28,5 +28,13 @@ module MonstrBackend
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    # This Project is API only
+    config.generators do |g|
+      g.assets false
+      g.helper false
+      g.template_engine false
+    end
+
   end
 end

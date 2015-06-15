@@ -1,0 +1,52 @@
+class Api::V1::PostsController < ApplicationController
+  before_action :authenticate_api_user!, only: [:create, :update, :destroy]
+  before_action :set_post, only: [:update, :destroy]
+
+  def index
+    @posts = Post.all
+    render json: {status: :success, posts: @posts}
+  end
+
+  def create
+
+    @post = Post.new(post_params)
+    @post.user = current_api_user
+
+    if @post.save
+      render json: {status: :created}
+    else
+      render json: @post.errors, status: :unprocessable_entity
+    end
+
+  end
+
+  def update
+
+    if @post.update(post_params)
+      render json: {status: :ok}
+    else
+      render json: @post.errors, status: :unprocessable_entity
+    end
+
+  end
+
+  def destroy
+    @post.destroy
+    head :no_content
+  end
+
+  def search
+    @posts = Post.all
+    render json: {status: :success, posts: @posts}
+  end
+
+  private
+    def set_post
+      @post = Post.find(params[:id])
+    end
+
+    def post_params
+      params.require(:post).permit(:title, :body)
+    end
+
+end
