@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Post do
+RSpec.describe Post, type: :model do
 
   before(:each) {
     @post = FactoryGirl.create(:post)
@@ -15,7 +15,7 @@ describe Post do
   it { should respond_to(:user) }
 
   it "#title returns a string" do
-    expect(@post.title).to match 'Hoge Fuga Title'
+    expect(@post.title).to match 'HelloWorld'
   end
 
   it "#body returns a string" do

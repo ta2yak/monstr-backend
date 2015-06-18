@@ -48,10 +48,13 @@ end
 gem 'devise_token_auth'
 # setting management library
 gem 'dotenv', '~> 2.0.1'
+# tree model
+gem 'closure_tree'
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'
   gem 'factory_girl_rails'
+  gem 'spring-commands-rspec'
 
   gem 'pry-rails'
   gem 'pry-doc'

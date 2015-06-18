@@ -11,7 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150615140311) do
+ActiveRecord::Schema.define(version: 20150616143054) do
+
+  create_table "index_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id",   limit: 4, null: false
+    t.integer "descendant_id", limit: 4, null: false
+    t.integer "generations",   limit: 4, null: false
+  end
+
+  add_index "index_hierarchies", ["ancestor_id", "descendant_id", "generations"], name: "index_anc_desc_idx", unique: true, using: :btree
+  add_index "index_hierarchies", ["descendant_id"], name: "index_desc_idx", using: :btree
+
+  create_table "indices", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "parent_id",  limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "post_id",    limit: 4
+  end
 
   create_table "posts", force: :cascade do |t|
     t.string   "title",      limit: 255

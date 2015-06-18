@@ -13,6 +13,9 @@ Rails.application.routes.draw do
       delete 'posts/:id' => 'posts#destroy'
       get 'posts/search' => 'posts#search'
 
+      # INDEX API
+      get 'index/all'
+
     end
 
   end
