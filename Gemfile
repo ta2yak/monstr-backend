@@ -50,6 +50,8 @@ gem 'devise_token_auth'
 gem 'dotenv', '~> 2.0.1'
 # tree model
 gem 'closure_tree'
+# diff
+gem 'diffy'
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'

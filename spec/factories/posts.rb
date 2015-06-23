@@ -16,6 +16,24 @@ FactoryGirl.define do
       is_wip true
     end
 
+    factory :post_rev2 do
+      title "HelloWorld2"
+      body "Hello World"
+      is_wip false
+    end
+
+    factory :post_rev3 do
+      title "HelloWorld2"
+      body "Hello World3"
+      is_wip false
+    end
+
+    factory :post_rev4 do
+      title "HelloWorld2"
+      body "Hello World3"
+      is_wip true
+    end
+
   end
 
 end

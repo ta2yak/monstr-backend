@@ -3,9 +3,10 @@ require 'rails_helper'
 RSpec.describe Post, type: :model do
 
   before(:each) {
-    @post = FactoryGirl.create(:post)
     @user = FactoryGirl.create(:user)
+    @post = FactoryGirl.build(:post)
     @post.user = @user
+    @post.save
   }
 
   subject { @post }
@@ -29,6 +30,13 @@ RSpec.describe Post, type: :model do
 
   it "#user returns a user" do
     expect(@post.user.id).to match @user.id
+  end
+
+  it "#generate revisions" do
+    @post.update(FactoryGirl.attributes_for(:post_rev2))
+    @post.update(FactoryGirl.attributes_for(:post_rev3))
+    @post.update(FactoryGirl.attributes_for(:post_rev4))
+    expect(@post.revisions.tapp.count).to match 4
   end
 
 end

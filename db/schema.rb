@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150620224109) do
+ActiveRecord::Schema.define(version: 20150623164822) do
 
   create_table "index_hierarchies", id: false, force: :cascade do |t|
     t.integer "ancestor_id",   limit: 4, null: false
@@ -38,6 +38,18 @@ ActiveRecord::Schema.define(version: 20150620224109) do
     t.integer  "user_id",    limit: 4
     t.boolean  "is_wip",     limit: 1
   end
+
+  create_table "revisions", force: :cascade do |t|
+    t.string   "headline",   limit: 255
+    t.text     "full_text",  limit: 65535
+    t.text     "diff_text",  limit: 65535
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "post_id",    limit: 4
+  end
+
+  add_index "revisions", ["user_id"], name: "index_revisions_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "provider",               limit: 255,                null: false
@@ -68,4 +80,5 @@ ActiveRecord::Schema.define(version: 20150620224109) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
 
+  add_foreign_key "revisions", "users"
 end
