@@ -1,6 +1,6 @@
 class Api::V1::PostsController < ApplicationController
   before_action :authenticate_api_user!, only: [:create, :update, :destroy]
-  before_action :set_post, only: [:update, :destroy]
+  before_action :set_post, only: [:show, :update, :destroy]
 
   def index
     @posts = Post.all
@@ -18,6 +18,10 @@ class Api::V1::PostsController < ApplicationController
       render json: @post.errors, status: :unprocessable_entity
     end
 
+  end
+
+  def show
+    render json: {status: :ok, post: @post}
   end
 
   def update

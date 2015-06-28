@@ -1,17 +1,22 @@
 Rails.application.routes.draw do
 
+  get '/', :to => redirect('/index.html')
+
   namespace :api, defaults: { format: :json } do
     scope :v1 do
       mount_devise_token_auth_for 'User', at: 'auth'
     end
 
     namespace :v1 do
+      # Global Search API
+      get 'search' => 'posts#search'
+
       # POST API
       get 'posts' => 'posts#index'
+      get 'posts/:id' => 'posts#show'
       post 'posts' => 'posts#create'
       put 'posts/:id' => 'posts#update'
       delete 'posts/:id' => 'posts#destroy'
-      get 'posts/search' => 'posts#search'
 
       # INDEX API
       get 'index/all'
