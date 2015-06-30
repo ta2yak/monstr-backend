@@ -3,11 +3,20 @@ class Post < ActiveRecord::Base
   has_one :index, dependent: :destroy
   has_many :revisions, dependent: :destroy
 
+  validates :title, presence: true, uniqueness: true
+  validates :body, presence: true
+
   before_save do |post|
+
+    # Reset this post's index
+    post.index.destroy if post.index.present?
+
+    # Remove first char If First char is /
+    post.title.sub!(%r[^/], "")
+
     # Generate Index and connect post and set last index to title
     indexes_values = post.title.split("/")
 
-    post.title = indexes_values.last
     index = Index.find_or_create_by_path(indexes_values)
     index.post = post
   end

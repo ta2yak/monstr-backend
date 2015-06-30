@@ -11,15 +11,6 @@ RSpec.describe "Posts", type: :request do
 
     end
 
-    describe "GET /api/v1/posts/search" do
-
-      it "returns http success" do
-        get api_v1_posts_search_path
-        expect(response).to have_http_status(:success)
-      end
-
-    end
-
   end
 
   describe "Require Token API" do
