@@ -546,7 +546,11 @@ var PostEditPage = React.createClass({displayName: "PostEditPage",
   },
 
   _onChange: function() {
-    this.setState({successes: PostStore.getSuccesses(), errors: PostStore.getErrors()});
+    if (PostStore.isError()){
+      this.setState({errors: PostStore.getErrors()});
+    }else{
+      RouteActionCreators.redirect('posts');
+    }
   },
 
   _onUpdateMarkdown: function(event){
@@ -647,6 +651,9 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
       RouteActionCreators.redirect('app');
     }else{
       PostStore.addChangeListener(this._onChange);
+      this.setState({
+          post: PostStore.getPost()
+      });
     }
   },
 
@@ -822,7 +829,7 @@ var PostNewPage = React.createClass({displayName: "PostNewPage",
   },
 
   componentDidMount: function() {
-    if (!SessionStore.isLoggedIn()) { 
+    if (!SessionStore.isLoggedIn()) {
       RouteActionCreators.redirect('app');
     }else{
       PostStore.addChangeListener(this._onChange);
@@ -834,7 +841,11 @@ var PostNewPage = React.createClass({displayName: "PostNewPage",
   },
 
   _onChange: function() {
-    this.setState({successes: PostStore.getSuccesses(), errors: PostStore.getErrors()});
+    if (PostStore.isError()){
+      this.setState({errors: PostStore.getErrors()});
+    }else{
+      RouteActionCreators.redirect('posts');
+    }
   },
 
   _onUpdateMarkdown: function(event){
@@ -897,7 +908,6 @@ var PostNewPage = React.createClass({displayName: "PostNewPage",
 });
 
 module.exports = PostNewPage;
-
 },{"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../components/common/ErrorNotice.react.jsx":10,"../../components/common/SuccessNotice.react.jsx":11,"../../stores/PostStore.react.jsx":23,"../../stores/SessionStore.react.jsx":25,"markdown":34,"react":230}],16:[function(require,module,exports){
 var React = require('react');
 var SessionActionCreators = require('../../actions/SessionActionCreators.react.jsx');
@@ -1213,7 +1223,9 @@ var MonstrAppDispatcher = assign(new Dispatcher(), {
       source: PayloadSources.SERVER_ACTION,
       action: action
     };
-    this.dispatch(payload);
+    setTimeout(function(){
+      this.dispatch(payload);
+    }.bind(this))
   },
 
   handleViewAction: function(action) {
@@ -1221,7 +1233,9 @@ var MonstrAppDispatcher = assign(new Dispatcher(), {
       source: PayloadSources.VIEW_ACTION,
       action: action
     };
-    this.dispatch(payload);
+    setTimeout(function(){
+      this.dispatch(payload);
+    }.bind(this))
   }
 });
 
@@ -1359,6 +1373,10 @@ var PostStore = assign({}, EventEmitter.prototype, {
     return _post;
   },
 
+  isError: function() {
+    return _errors.length > 0 ? true : false;
+  },
+
   getErrors: function() {
     return _errors;
   },
@@ -1456,7 +1474,7 @@ var ActionTypes = MonstrConstants.ActionTypes;
 var CHANGE_EVENT = 'change';
 
 var RouteStore = assign({}, EventEmitter.prototype, {
-  
+
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
@@ -1484,26 +1502,26 @@ RouteStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
   ]);
 
   var action = payload.action;
-  
+
   switch(action.type) {
 
     case ActionTypes.REDIRECT:
-      router.transitionTo(action.route);
+      router.transitionTo(action.route)
       break;
 
-    case ActionTypes.LOGIN_RESPONSE:
-      if (SessionStore.isLoggedIn()) {
-        router.transitionTo('app');
-      }
-      break;
-    
-    case ActionTypes.RECEIVE_CREATED_POST:
-      router.transitionTo('new-post');
-      break;
+    // case ActionTypes.LOGIN_RESPONSE:
+    //   if (SessionStore.isLoggedIn()) {
+    //     router.transitionTo('app');
+    //   }
+    //   break;
+    //
+    // case ActionTypes.RECEIVE_CREATED_POST:
+    //   router.transitionTo('new-post');
+    //   break;
 
     default:
   }
-  
+
   return true;
 });
 
