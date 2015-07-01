@@ -7857,6 +7857,9 @@ hr.on-light {
   font-size: 3.8em;
   margin-top: 10px;
 }
+.treeview .selected {
+  color: #03a9f4;
+}
 /* TreeViewに関するCSS */
 .treeview span.indent {
   margin-left: 10px;

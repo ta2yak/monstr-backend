@@ -1,6 +1,7 @@
 class Api::V1::PostsController < ApplicationController
   before_action :authenticate_api_user!, only: [:create, :update, :destroy]
-  before_action :set_post, only: [:show, :update, :destroy]
+  before_action :set_post, only: [:update, :destroy]
+  before_action :set_post_with_revisions, only: [:show]
 
   def index
     @posts = Post.all
@@ -47,6 +48,10 @@ class Api::V1::PostsController < ApplicationController
   private
     def set_post
       @post = Post.find(params[:id])
+    end
+
+    def set_post_with_revisions
+      @post = Post.includes(:revisions).where("posts.id = ?", params[:id]).first
     end
 
     def post_params

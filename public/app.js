@@ -595,24 +595,27 @@ var PostEditPage = React.createClass({displayName: "PostEditPage",
 
         React.createElement("div", {className: "col-md-6"}, 
           React.createElement("div", {className: "col-md-12"}, 
-            React.createElement("input", {type: "text", 　ref: "title", defaultValue: this.state.post.title, className: "form-control floating-label input-lg", placeholder: "title (/ により階層分類が可能です ex. /2015/06/01/日報)"})
+            React.createElement("input", {type: "text", 　ref: "title", defaultValue: this.state.post.title, className: "form-control floating-label input-lg", placeholder: "title (/ により階層分類が可能です ex. Application/Setup/Install)"})
           ), 
           React.createElement("div", {className: "col-md-12 spacer"}, 
-            React.createElement("textarea", {　ref: "body", defaultValue: this.state.post.body, className: "form-control floating-label", placeholder: "Markdown Text", onChange: this._onUpdateMarkdown, rows: "30"})
+            React.createElement("textarea", {　ref: "body", defaultValue: this.state.post.body, className: "form-control floating-label", placeholder: "Markdown Text", onChange: this._onUpdateMarkdown, rows: "20"})
+          ), 
+
+          React.createElement("div", {className: "col-md-12"}, 
+            React.createElement("div", {className: "col-md-3"}, 
+              React.createElement("button", {className: "btn btn-danger pull-left", type: "button", onClick: this._onDelete}, "削除")
+            ), 
+            React.createElement("div", {className: "col-md-6 col-md-offset-3"}, 
+              React.createElement("button", {className: "btn btn-info pull-right", type: "button", onClick: this._onWIP}, "WIP"), 
+              React.createElement("button", {className: "btn btn-primary pull-right", type: "button", onClick: this._onCommit}, "登録")
+            )
           )
+
         ), 
 
         React.createElement("div", {className: "col-md-6"}, 
           React.createElement("div", {className: "preview"}, 
             React.createElement("div", {dangerouslySetInnerHTML: {__html: html}})
-          )
-        ), 
-
-        React.createElement("div", {className: "col-md-12"}, 
-          React.createElement("div", {className: "col-md-4 col-md-offset-4"}, 
-            React.createElement("button", {className: "btn btn-info", type: "button", onClick: this._onWIP}, "WIP"), 
-            React.createElement("button", {className: "btn btn-primary", type: "button", onClick: this._onCommit}, "更新"), 
-            React.createElement("button", {className: "btn btn-danger", type: "button", onClick: this._onDelete}, "削除")
           )
         )
 
@@ -720,32 +723,46 @@ var PostActionCreators = require('../../actions/PostActionCreators.react.jsx');
 
 var SessionStore = require('../../stores/SessionStore.react.jsx');
 var IndexStore = require('../../stores/IndexStore.react.jsx');
+var PostStore = require('../../stores/PostStore.react.jsx');
 
 var PostIndexTree = React.createClass({displayName: "PostIndexTree",
   getInitialState: function() {
-      return {data: []};
+      return {data: [], currentPost: {}};
   },
 
   componentDidMount: function() {
     if (!SessionStore.isLoggedIn()) {
       RouteActionCreators.redirect('app');
     }else{
-      IndexStore.addChangeListener(this._onChange);
+      PostStore.addChangeListener(this._onPostChange);
+      IndexStore.addChangeListener(this._onIndexChange);
       IndexActionCreators.loadIndex();
+      this.setState({
+          currentPost: PostStore.getPost()
+      });
     }
   },
 
   componentWillUnmount: function() {
-    IndexStore.removeChangeListener(this._onChange);
+    PostStore.removeChangeListener(this._onPostChange);
+    IndexStore.removeChangeListener(this._onIndexChange);
   },
 
-  _onChange: function() {
+  _onIndexChange: function() {
     this.setState({
         data: IndexStore.getIndexes()
     });
   },
 
+  _onPostChange: function() {
+    this.setState({
+        currentPost: PostStore.getPost()
+    });
+  },
+
   _genNode: function(nodes){
+
+    var selectedPost = this.state.currentPost;
 
     var navTree = function(nodes, depth){
 
@@ -778,14 +795,16 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
 
         }else{
 
+          var selected = (selectedPost.id == node.post) ? "selected" : ""
           return (
             React.createElement("div", {className: "accordion-inner", key: node.id}, 
               indents, 
-              React.createElement("a", {onClick: onSelect.bind(this, node.post)}, 
+              React.createElement("a", {className: selected, onClick: onSelect.bind(this, node.post)}, 
                 React.createElement("i", {className: "mdi-action-description"}), " ", node.title
               )
             )
           );
+
         }
 
       });
@@ -812,7 +831,7 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
 
 module.exports = PostIndexTree;
 
-},{"../../actions/IndexActionCreators.react.jsx":2,"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../stores/IndexStore.react.jsx":22,"../../stores/SessionStore.react.jsx":25,"react":230}],15:[function(require,module,exports){
+},{"../../actions/IndexActionCreators.react.jsx":2,"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../stores/IndexStore.react.jsx":22,"../../stores/PostStore.react.jsx":23,"../../stores/SessionStore.react.jsx":25,"react":230}],15:[function(require,module,exports){
 var React = require('react');
 var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var PostActionCreators = require('../../actions/PostActionCreators.react.jsx');
@@ -880,24 +899,27 @@ var PostNewPage = React.createClass({displayName: "PostNewPage",
         errors, 
 
         React.createElement("div", {className: "col-md-6"}, 
+
           React.createElement("div", {className: "col-md-12"}, 
-            React.createElement("input", {type: "text", 　ref: "title", className: "form-control floating-label input-lg", placeholder: "title (/ により階層分類が可能です ex. /2015/06/01/日報)"})
+            React.createElement("input", {type: "text", 　ref: "title", className: "form-control floating-label input-lg", placeholder: "title (/ により階層分類が可能です ex. Application/Setup/Install)"})
           ), 
+
           React.createElement("div", {className: "col-md-12 spacer"}, 
-            React.createElement("textarea", {　ref: "body", className: "form-control floating-label", placeholder: "Markdown Text", onInput: this._onUpdateMarkdown, rows: "30"})
+            React.createElement("textarea", {　ref: "body", className: "form-control floating-label", placeholder: "Markdown Text", onInput: this._onUpdateMarkdown, rows: "20"})
+          ), 
+
+          React.createElement("div", {className: "col-md-12"}, 
+            React.createElement("div", {className: "col-md-6 col-md-offset-6"}, 
+              React.createElement("button", {className: "btn btn-info pull-right", type: "button", onClick: this._onWIP}, "WIP"), 
+              React.createElement("button", {className: "btn btn-primary pull-right", type: "button", onClick: this._onCommit}, "登録")
+            )
           )
+
         ), 
 
         React.createElement("div", {className: "col-md-6"}, 
           React.createElement("div", {className: "preview"}, 
             React.createElement("div", {dangerouslySetInnerHTML: {__html: html}})
-          )
-        ), 
-
-        React.createElement("div", {className: "col-md-12"}, 
-          React.createElement("div", {className: "col-md-4 col-md-offset-4"}, 
-            React.createElement("button", {className: "btn btn-info", type: "button", onClick: this._onWIP}, "WIP"), 
-            React.createElement("button", {className: "btn btn-primary", type: "button", onClick: this._onCommit}, "登録")
           )
         )
 
@@ -1435,6 +1457,8 @@ PostStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       break;
 
     case ActionTypes.RECEIVE_POST:
+      console.log(action.json.post);
+      console.log(action.json.post.id);
       if (action.json) {
         _post = action.json.post;
         _errors = [];
