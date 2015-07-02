@@ -675,12 +675,34 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
     var errors = (this.state.errors.length > 0) ? React.createElement(ErrorNotice, {errors: this.state.errors}) : React.createElement("div", null);
     var html = this.state.post.body ? markdown.toHTML(this.state.post.body) : ""
     var editButton = this.state.post.title ? (
-      React.createElement("div", {className: "col-md-4 col-md-offset-4"}, 
-        React.createElement(Link, {to: "edit-post"}, 
-          React.createElement("button", {className: "btn btn-primary", type: "button"}, "修正する")
-        )
+      React.createElement(Link, {to: "edit-post"}, 
+        React.createElement("button", {className: "btn btn-primary pull-right", type: "button"}, "修正する")
       )
     ) : React.createElement("div", null);
+
+    var revisions = this.state.post.title ? this.state.post.revisions.map(function(revision, index){
+      var diffs = revision.diff_text.split('\n').map(function(text, i){
+          return (
+            React.createElement("p", {key: i}, React.createElement("small", null, text))
+          )
+      });
+
+      return (
+
+        React.createElement("div", {className: "panel panel-default", key: index}, 
+          React.createElement("div", {className: "panel-heading clearfix"}, 
+            React.createElement("h3", {className: "panel-title pull-left"}, revision.headline)
+          ), 
+          React.createElement("div", {className: "panel-body"}, 
+            diffs
+          ), 
+          React.createElement("div", {className: "panel-footer"}, 
+            React.createElement("small", null, revision.created_at)
+          )
+        )
+
+      )
+    }) : React.createElement("div", null);
 
     return (
 
@@ -692,18 +714,26 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
           React.createElement(IndexTree, null)
         ), 
 
-        React.createElement("div", {className: "col-md-8"}, 
+        React.createElement("div", {className: "col-md-6"}, 
+
           React.createElement("div", {className: "col-md-12"}, 
             React.createElement("h1", null, this.state.post.title)
           ), 
+
           React.createElement("div", {className: "col-md-12"}, 
-            React.createElement("div", {dangerouslySetInnerHTML: {__html: html}}), 
-            editButton
+            React.createElement("div", {dangerouslySetInnerHTML: {__html: html}})
+          ), 
+
+          React.createElement("div", {className: "col-md-12"}, 
+            React.createElement("div", {className: "col-md-6 col-md-offset-6"}, 
+              editButton
+            )
           )
+
         ), 
 
-        React.createElement("div", {className: "col-md-2"}, 
-          this.state.post.revisions
+        React.createElement("div", {className: "col-md-4"}, 
+          revisions
         )
 
       )
@@ -1432,6 +1462,7 @@ PostStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       if (action.errors) {
         _errors = action.errors;
       }else{
+        _post = action.json.post;
         _successes = ["登録しました"];
       }
       PostStore.emitChange();
@@ -1441,6 +1472,7 @@ PostStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       if (action.errors) {
         _errors = action.errors;
       }else{
+        _post = action.json.post;
         _successes = ["更新しました"];
       }
       PostStore.emitChange();
@@ -1457,8 +1489,6 @@ PostStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       break;
 
     case ActionTypes.RECEIVE_POST:
-      console.log(action.json.post);
-      console.log(action.json.post.id);
       if (action.json) {
         _post = action.json.post;
         _errors = [];

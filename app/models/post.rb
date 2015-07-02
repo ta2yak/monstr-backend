@@ -30,7 +30,7 @@ class Post < ActiveRecord::Base
       new_text = build_revision_message(post.title, post.body, post.is_wip)
       prev_text = build_revision_message(post.title_was, post.body_was, post.is_wip_was)
 
-      headline = Diffy::Diff.new(prev_text, new_text).first.chomp
+      headline = Diffy::Diff.new(prev_text, new_text, :context => 0).first.chomp
       diff_text = Diffy::Diff.new(prev_text, new_text, :context => 5).to_s(:text)
 
       Revision.create({headline:headline, full_text:new_text, diff_text:diff_text, user:post.user, post:post})
@@ -46,13 +46,12 @@ class Post < ActiveRecord::Base
 private
 
   def build_revision_message(title, body, is_wip)
-    message = <<-"EOS"
-    #{title}
-    #{body}
-    #{is_wip ? "Save as WIP": "Ship it!"}
-    EOS
-
-    message
+    message_array = []
+    message_array << title if title.present?
+    message_array << body if body.present?
+    message_array << (is_wip ? "Save as WIP": "Ship it!") if is_wip.present?
+    message_array << "" # fix \ No newline at end of file
+    message_array.join("\n")
   end
 
 end

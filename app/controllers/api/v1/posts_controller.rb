@@ -14,7 +14,7 @@ class Api::V1::PostsController < ApplicationController
     @post.user = current_api_user
 
     if @post.save
-      render json: {status: :created}
+      render json: {status: :created, post: @post}
     else
       render json: {errors: {full_messages: @post.errors.full_messages}}, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class Api::V1::PostsController < ApplicationController
   def update
 
     if @post.update(post_params)
-      render json: {status: :ok}
+      render json: {status: :ok, post: @post}
     else
       render json: {errors: {full_messages: @post.errors.full_messages}}, status: :unprocessable_entity
     end

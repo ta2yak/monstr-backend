@@ -7840,6 +7840,9 @@ hr.on-light {
 .shadow-z-5 {
   box-shadow: 0 27px 24px 0 rgba(0, 0, 0, 0.2), 0 40px 77px 0 rgba(0, 0, 0, 0.22);
 }
+body {
+  padding-top: 0px;
+}
 /* 幅いっぱいにする設定 */
 .container {
   width: auto;
