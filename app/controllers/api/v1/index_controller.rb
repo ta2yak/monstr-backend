@@ -1,5 +1,4 @@
 class Api::V1::IndexController < ApplicationController
-  before_action :authenticate_api_user!
 
   def all
 

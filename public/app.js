@@ -14,11 +14,13 @@ module.exports = {
   dispatch: function(actionType, error, res){
 
     header = res.header;
+    status = res.status;
     json = JSON.parse(res.text);
     errors = getErrors(json);
 
     MonstrAppDispatcher.handleServerAction({
       type: actionType,
+      status: status,
       header: header,
       json: json,
       errors: errors
@@ -52,7 +54,11 @@ module.exports = {
       .set('expiry', sessionStorage.getItem('expiry'))
       .set('client', sessionStorage.getItem('client'))
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_INDEX, error ,res)
+        if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+          ActionHelper.dispatch(ActionTypes.RECEIVE_INDEX, error ,res)
+        }
       });
   }
 
@@ -83,7 +89,11 @@ module.exports = {
       .set('expiry', sessionStorage.getItem('expiry'))
       .set('client', sessionStorage.getItem('client'))
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_POSTS, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_POSTS, error ,res)
+        }
       });
 	},
 
@@ -100,7 +110,11 @@ module.exports = {
       .set('expiry', sessionStorage.getItem('expiry'))
       .set('client', sessionStorage.getItem('client'))
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_POST, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_POST, error ,res)
+        }
       });
 	},
 
@@ -119,7 +133,11 @@ module.exports = {
       .set('client', sessionStorage.getItem('client'))
       .send({ post: { title: title, body: body, is_wip: false } })
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
+        }
       });
 
 	},
@@ -139,7 +157,11 @@ module.exports = {
       .set('client', sessionStorage.getItem('client'))
       .send({ post: { title: title, body: body, is_wip: true } })
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
+        }
       });
   },
 
@@ -158,7 +180,11 @@ module.exports = {
       .set('client', sessionStorage.getItem('client'))
       .send({ post: { title: title, body: body, is_wip: false } })
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
+        }
       });
 
 	},
@@ -178,7 +204,11 @@ module.exports = {
       .set('client', sessionStorage.getItem('client'))
       .send({ post: { title: title, body: body, is_wip: true } })
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
+        }
       });
   },
 
@@ -194,7 +224,11 @@ module.exports = {
       .set('expiry', sessionStorage.getItem('expiry'))
       .set('client', sessionStorage.getItem('client'))
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.RECEIVE_DELETED_POST, error ,res)
+				if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+					ActionHelper.dispatch(ActionTypes.RECEIVE_DELETED_POST, error ,res)
+        }
       });
   }
 
@@ -239,7 +273,11 @@ module.exports = {
 	      .set('Accept', 'application/json')
 				.send({ search: { word: query } })
 	      .end(function(error, res){
-          ActionHelper.dispatch(ActionTypes.SEARCH_RESPONSE, error ,res)
+					if (res.status == "401"){
+	          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+	        }else{
+						ActionHelper.dispatch(ActionTypes.SEARCH_RESPONSE, error ,res)
+	        }
 	      });
 
 	}
@@ -276,7 +314,11 @@ module.exports = {
       })
       .set('Accept', 'application/json')
       .end(function(error, res) {
-        ActionHelper.dispatch(ActionTypes.LOGIN_RESPONSE, error ,res)
+        if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+          ActionHelper.dispatch(ActionTypes.LOGIN_RESPONSE, error ,res)
+        }
       });
 
   },
@@ -296,7 +338,11 @@ module.exports = {
       })
       .set('Accept', 'application/json')
       .end(function(error, res){
-        ActionHelper.dispatch(ActionTypes.LOGIN_RESPONSE, error ,res)
+        if (res.status == "401"){
+          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+        }else{
+          ActionHelper.dispatch(ActionTypes.LOGIN_RESPONSE, error ,res)
+        }
       });
   },
 
@@ -338,7 +384,6 @@ var Menu = React.createClass({displayName: "Menu",
   },
 
   render: function() {
-
     var menuItems = this.props.isLoggedIn ? (
 
       React.createElement("div", {className: "btn-group-justified"}, 
@@ -381,6 +426,13 @@ var Menu = React.createClass({displayName: "Menu",
             React.createElement("i", {className: "glyphicon glyphicon-home"}), 
             React.createElement("br", null), 
             "Home"
+          )
+        ), 
+        React.createElement(Link, {to: "posts"}, 
+          React.createElement("button", {className: "btn btn-xs btn-primary btn-block"}, 
+            React.createElement("i", {className: "mdi-editor-insert-drive-file"}), 
+            React.createElement("br", null), 
+            "POSTS"
           )
         ), 
         React.createElement(Link, {to: "login"}, 
@@ -580,6 +632,7 @@ var PostEditPage = React.createClass({displayName: "PostEditPage",
     e.preventDefault();
     this.setState({ errors: [], successes: [] });
     PostActionCreators.deletePost(this.state.post.id);
+    RouteActionCreators.redirect("posts");
   },
 
   render: function() {
@@ -643,6 +696,7 @@ var SuccessNotice = require('../../components/common/SuccessNotice.react.jsx');
 var IndexTree = require('../../components/post/IndexTree.react.jsx');
 
 var markdown = require('markdown').markdown;
+var moment = require('moment');
 
 var PostIndexPage = React.createClass({displayName: "PostIndexPage",
 
@@ -651,14 +705,10 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
   },
 
   componentDidMount: function() {
-    if (!SessionStore.isLoggedIn()) {
-      RouteActionCreators.redirect('app');
-    }else{
-      PostStore.addChangeListener(this._onChange);
-      this.setState({
-          post: PostStore.getPost()
-      });
-    }
+    PostStore.addChangeListener(this._onChange);
+    this.setState({
+        post: PostStore.getPost()
+    });
   },
 
   componentWillUnmount: function() {
@@ -675,7 +725,7 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
   render: function() {
     var errors = (this.state.errors.length > 0) ? React.createElement(ErrorNotice, {errors: this.state.errors}) : React.createElement("div", null);
     var html = this.state.post.body ? markdown.toHTML(this.state.post.body) : ""
-    var editButton = this.state.post.title ? (
+    var editButton = (SessionStore.isLoggedIn() && this.state.post.title) ? (
       React.createElement(Link, {to: "edit-post"}, 
         React.createElement("button", {className: "btn btn-primary pull-right", type: "button"}, "修正する")
       )
@@ -693,13 +743,24 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
 
         React.createElement("div", {className: "panel panel-default", key: index}, 
           React.createElement("div", {className: "panel-heading clearfix"}, 
-            React.createElement("h3", {className: "panel-title pull-left"}, revision.headline)
+            React.createElement("h3", {className: "panel-title pull-left"}, 
+              React.createElement("a", {class: "btn btn-primary", role: "button", "data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
+                revision.headline
+              )
+            ), 
+            React.createElement("small", {className: "pull-right"}, 
+              React.createElement("a", {class: "btn btn-primary", role: "button", "data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
+                "More"
+              )
+            )
           ), 
-          React.createElement("div", {className: "panel-body"}, 
+          React.createElement("div", {className: "panel-body collapse", id: "collapse"+index}, 
             diffs
           ), 
           React.createElement("div", {className: "panel-footer"}, 
-            React.createElement("small", null, revision.created_at)
+            React.createElement("small", {className: "pull-right"}, 
+              moment(revision.created_at).fromNow()
+            )
           )
         )
 
@@ -747,7 +808,7 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
 
 module.exports = PostIndexPage;
 
-},{"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../components/common/ErrorNotice.react.jsx":10,"../../components/common/SuccessNotice.react.jsx":11,"../../components/post/IndexTree.react.jsx":14,"../../stores/PostStore.react.jsx":23,"../../stores/SessionStore.react.jsx":25,"markdown":34,"react":230,"react-router":62}],14:[function(require,module,exports){
+},{"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../components/common/ErrorNotice.react.jsx":10,"../../components/common/SuccessNotice.react.jsx":11,"../../components/post/IndexTree.react.jsx":14,"../../stores/PostStore.react.jsx":23,"../../stores/SessionStore.react.jsx":25,"markdown":34,"moment":36,"react":230,"react-router":62}],14:[function(require,module,exports){
 var React = require('react');
 
 var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
@@ -764,16 +825,12 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
   },
 
   componentDidMount: function() {
-    if (!SessionStore.isLoggedIn()) {
-      RouteActionCreators.redirect('app');
-    }else{
-      PostStore.addChangeListener(this._onPostChange);
-      IndexStore.addChangeListener(this._onIndexChange);
-      IndexActionCreators.loadIndex();
-      this.setState({
-          currentPost: PostStore.getPost()
-      });
-    }
+    PostStore.addChangeListener(this._onPostChange);
+    IndexStore.addChangeListener(this._onIndexChange);
+    IndexActionCreators.loadIndex();
+    this.setState({
+        currentPost: PostStore.getPost()
+    });
   },
 
   componentWillUnmount: function() {
@@ -966,15 +1023,18 @@ module.exports = PostNewPage;
 },{"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../components/common/ErrorNotice.react.jsx":10,"../../components/common/SuccessNotice.react.jsx":11,"../../stores/PostStore.react.jsx":23,"../../stores/SessionStore.react.jsx":25,"markdown":34,"react":230}],16:[function(require,module,exports){
 var React = require('react');
 var SessionActionCreators = require('../../actions/SessionActionCreators.react.jsx');
+var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var SessionStore = require('../../stores/SessionStore.react.jsx');
 var ErrorNotice = require('../../components/common/ErrorNotice.react.jsx');
+
+var ENTER_KEY = 13;
 
 var LoginPage = React.createClass({displayName: "LoginPage",
 
   getInitialState: function() {
     return { errors: [] };
   },
- 
+
   componentDidMount: function() {
     SessionStore.addChangeListener(this._onChange);
   },
@@ -984,9 +1044,18 @@ var LoginPage = React.createClass({displayName: "LoginPage",
   },
 
   _onChange: function() {
-    this.setState({ errors: SessionStore.getErrors() });
+    if (SessionStore.isError()) {
+      this.setState({ errors: SessionStore.getErrors() });
+    }else{
+      RouteActionCreators.redirect("welcome");
+    }
   },
 
+  _onHandleKeyDown: function (event) {
+		if (event.which === ENTER_KEY) {
+			this._onSubmit(event);
+		}
+	},
   _onSubmit: function(e) {
     e.preventDefault();
     this.setState({ errors: [] });
@@ -1008,14 +1077,14 @@ var LoginPage = React.createClass({displayName: "LoginPage",
           React.createElement("div", {className: "panel panel-default"}, 
 
             React.createElement("div", {className: "panel-heading"}, 
-              React.createElement("h3", {className: "panel-title"}, "Monstr Login")
+              React.createElement("h3", {className: "panel-title text-center"}, "Monstr")
             ), 
 
             React.createElement("div", {className: "panel-body"}, 
               React.createElement("div", {className: "inputs"}, 
-                React.createElement("input", {type: "email", ref: "email", className: "form-control floating-label", placeholder: "email"}), 
+                React.createElement("input", {type: "email", ref: "email", className: "form-control floating-label input-lg", placeholder: "Email", onKeyDown: this._onHandleKeyDown}), 
                 React.createElement("br", null), 
-                React.createElement("input", {type: "password", ref: "password", className: "form-control floating-label", placeholder: "password"})
+                React.createElement("input", {type: "password", ref: "password", className: "form-control floating-label input-lg", placeholder: "Password", onKeyDown: this._onHandleKeyDown})
               )
             ), 
 
@@ -1034,11 +1103,14 @@ var LoginPage = React.createClass({displayName: "LoginPage",
 
 module.exports = LoginPage;
 
-},{"../../actions/SessionActionCreators.react.jsx":6,"../../components/common/ErrorNotice.react.jsx":10,"../../stores/SessionStore.react.jsx":25,"react":230}],17:[function(require,module,exports){
+},{"../../actions/RouteActionCreators.react.jsx":4,"../../actions/SessionActionCreators.react.jsx":6,"../../components/common/ErrorNotice.react.jsx":10,"../../stores/SessionStore.react.jsx":25,"react":230}],17:[function(require,module,exports){
 var React = require('react');
 var SessionActionCreators = require('../../actions/SessionActionCreators.react.jsx');
+var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var SessionStore = require('../../stores/SessionStore.react.jsx');
 var ErrorNotice = require('../../components/common/ErrorNotice.react.jsx');
+
+var ENTER_KEY = 13;
 
 var SignupPage = React.createClass({displayName: "SignupPage",
 
@@ -1055,8 +1127,18 @@ var SignupPage = React.createClass({displayName: "SignupPage",
   },
 
   _onChange: function() {
-    this.setState({ errors: SessionStore.getErrors() });
+    if (SessionStore.isError) {
+      this.setState({ errors: SessionStore.getErrors() });
+    }else{
+      RouteActionCreators.redirect("welcome");
+    }
   },
+
+  _onHandleKeyDown: function (event) {
+		if (event.which === ENTER_KEY) {
+			this._onSubmit(event);
+		}
+	},
 
   _onSubmit: function(e) {
     e.preventDefault();
@@ -1085,18 +1167,18 @@ var SignupPage = React.createClass({displayName: "SignupPage",
           React.createElement("div", {className: "panel panel-default"}, 
 
             React.createElement("div", {className: "panel-heading"}, 
-              React.createElement("h3", {className: "panel-title"}, "Monstr Signup")
+              React.createElement("h3", {className: "panel-title text-center"}, "Monstr")
             ), 
 
             React.createElement("div", {className: "panel-body"}, 
               React.createElement("div", {className: "inputs"}, 
-                React.createElement("input", {type: "email", ref: "email", className: "form-control floating-label", placeholder: "email"}), 
+                React.createElement("input", {type: "email", ref: "email", className: "form-control floating-label input-lg", placeholder: "Email", onKeyDown: this._onHandleKeyDown}), 
                 React.createElement("br", null), 
-                React.createElement("input", {type: "text", ref: "username", className: "form-control floating-label", placeholder: "username"}), 
+                React.createElement("input", {type: "text", ref: "username", className: "form-control floating-label input-lg", placeholder: "User Name", onKeyDown: this._onHandleKeyDown}), 
                 React.createElement("br", null), 
-                React.createElement("input", {type: "password", ref: "password", className: "form-control floating-label", placeholder: "password"}), 
+                React.createElement("input", {type: "password", ref: "password", className: "form-control floating-label input-lg", placeholder: "Password", onKeyDown: this._onHandleKeyDown}), 
                 React.createElement("br", null), 
-                React.createElement("input", {type: "password", ref: "passwordConfirmation", className: "form-control floating-label", placeholder: "password confirm"})
+                React.createElement("input", {type: "password", ref: "passwordConfirmation", className: "form-control floating-label input-lg", placeholder: "Password Confirm", onKeyDown: this._onHandleKeyDown})
               )
             ), 
 
@@ -1115,24 +1197,26 @@ var SignupPage = React.createClass({displayName: "SignupPage",
 
 module.exports = SignupPage;
 
-},{"../../actions/SessionActionCreators.react.jsx":6,"../../components/common/ErrorNotice.react.jsx":10,"../../stores/SessionStore.react.jsx":25,"react":230}],18:[function(require,module,exports){
+},{"../../actions/RouteActionCreators.react.jsx":4,"../../actions/SessionActionCreators.react.jsx":6,"../../components/common/ErrorNotice.react.jsx":10,"../../stores/SessionStore.react.jsx":25,"react":230}],18:[function(require,module,exports){
 var React = require('react');
 var SearchActionCreators = require('../../actions/SearchActionCreators.react.jsx');
 var PostActionCreators = require('../../actions/PostActionCreators.react.jsx');
 var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var PostStore = require('../../stores/PostStore.react.jsx');
 
+var ENTER_KEY = 13;
+
 var Result = React.createClass({displayName: "Result",
-  onSelect: function(){
+  _onSelect: function(){
     PostActionCreators.loadPost(this.props.post.id);
     RouteActionCreators.redirect("posts");
   },
   render: function() {
     var post = this.props.post;
     return (
-      React.createElement("div", {className: "col-md-10 col-md-offset-1"}, 
-        React.createElement("h2", null, React.createElement("a", {onClick: this.onSelect}, post.title)), 
-        React.createElement("p", {className: "lead"}, post.body)
+      React.createElement("div", {className: "col-md-10 col-md-offset-1 search-result"}, 
+        React.createElement("h3", null, React.createElement("a", {onClick: this._onSelect}, post.title)), 
+        React.createElement("p", {className: "lead search-text"}, React.createElement("small", null, post.body))
       )
     )
   }
@@ -1145,26 +1229,24 @@ var SearchResults = React.createClass({displayName: "SearchResults",
     var existsResult = this.props.posts.length > 0 ? true : false;
     return existsResult ? (
 
-      React.createElement("div", {className: "jumbotron"}, 
-        React.createElement("div", {className: "row spacer posts"}, 
+      React.createElement("div", {className: "row spacer posts search-results"}, 
 
-          this.props.posts.map(function(post, index){
-            return (
+        this.props.posts.map(function(post, index){
+          return (
 
-              React.createElement(Result, {post: post, key: post.id})
+            React.createElement(Result, {post: post, key: post.id})
 
-            );
-          })
+          );
+        })
 
-        )
       )
 
     ) : (
 
-      React.createElement("div", {className: "jumbotron"}, 
-        React.createElement("div", {className: "row spacer noresult"}, 
-          React.createElement("div", {className: "col-md-10 col-md-offset-1"}, 
-            React.createElement("p", {className: "text-muted text-center"}, "No Results")
+      React.createElement("div", {className: "row spacer noresult"}, 
+        React.createElement("div", {className: "col-md-10 col-md-offset-1"}, 
+          React.createElement("p", {className: "text-muted text-center"}, 
+            React.createElement("small", null, "No Results")
           )
         )
       )
@@ -1191,6 +1273,12 @@ var WelcomePage = React.createClass({displayName: "WelcomePage",
     this.setState({ posts: PostStore.getPosts() });
   },
 
+  _onHandleKeyDown: function (event) {
+		if (event.which === ENTER_KEY) {
+			this._onSubmit(event);
+		}
+	},
+
   _onSubmit: function(e) {
     e.preventDefault();
     this.setState({ posts: [] });
@@ -1204,19 +1292,19 @@ var WelcomePage = React.createClass({displayName: "WelcomePage",
       React.createElement("div", {className: "row spacer"}, 
 
         React.createElement("div", {className: "jumbotron"}, 
-          React.createElement("div", {className: "row spacer"}, 
 
+          React.createElement("div", {className: "row spacer"}, 
             React.createElement("div", {className: "col-md-6 col-md-offset-3"}, 
-              React.createElement("input", {type: "text", ref: "query", className: "form-control", placeholder: "Search for..."}), 
+              React.createElement("input", {type: "text", ref: "query", className: "form-control", placeholder: "Search for...", onKeyDown: this._onHandleKeyDown}), 
               React.createElement("div", {className: "col-md-4 col-md-offset-4"}, 
                 React.createElement("button", {className: "btn btn-primary", type: "button", onClick: this._onSubmit}, "Knowledge 検索")
               )
             )
+          ), 
 
-          )
-        ), 
+          React.createElement(SearchResults, {posts: this.state.posts})
 
-        React.createElement(SearchResults, {posts: this.state.posts})
+        )
 
       )
 
@@ -1500,8 +1588,8 @@ PostStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       if (action.errors) {
         _errors = action.errors;
       }else{
-        _successes = ["削除しました"];
         _post = {}
+      _successes = ["削除しました"];
       }
       PostStore.emitChange();
       break;
@@ -1656,6 +1744,10 @@ var SessionStore = assign({}, EventEmitter.prototype, {
     return _successes;
   },
 
+  isError: function() {
+    return _errors.length > 0 ? true : false;
+  },
+
   getErrors: function() {
     return _errors;
   }
@@ -1666,12 +1758,11 @@ SessionStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
   _errors = []
   _successes = [];
 
-    var action = payload.action;
+  var action = payload.action;
 
   // reflesh auth on each request
   switch(payload.source) {
     case PayloadSources.SERVER_ACTION:
-
       if (action.header && action.header['access-token']) {
         _accessToken = action.header['access-token'];
         _uid = action.header.uid;
@@ -1698,12 +1789,15 @@ SessionStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
         _successes = ["Welcome to Monstr !!"]
       }
 
+      console.log(ActionTypes.LOGIN_RESPONSE)
       SessionStore.emitChange();
       break;
 
     case ActionTypes.LOGOUT:
       _accessToken = null;
-      _email = null;
+      _uid = null;
+      _expiry = null;
+      _client = null;
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('uid');
       sessionStorage.removeItem('client');
@@ -1711,7 +1805,6 @@ SessionStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       SessionStore.emitChange();
       break;
 
-      default:
   }
 
   return true;
