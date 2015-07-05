@@ -40,11 +40,6 @@ class Api::V1::PostsController < ApplicationController
     head :no_content
   end
 
-  def search
-    @posts = Post.all
-    render json: {status: :success, posts: @posts}
-  end
-
   private
     def set_post
       @post = Post.find(params[:id])

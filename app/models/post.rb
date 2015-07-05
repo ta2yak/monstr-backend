@@ -6,6 +6,18 @@ class Post < ActiveRecord::Base
   validates :title, presence: true, uniqueness: true
   validates :body, presence: true
 
+  def self.search(words)
+    boody_query = nil
+    if words.present?
+      body = Post.arel_table[:body]
+      boody_query = body.matches("%" + words[0] + "%")
+      for i in 1...words.length
+        boody_query = boody_query.or(body.matches("%" + words[0] + "%"))
+      end
+    end
+    Post.where(boody_query)
+  end
+
   before_save do |post|
 
     # Reset this post's index

@@ -235,8 +235,9 @@ module.exports = {
 	  		type: ActionTypes.SEARCH
 	  	});
 
-	    request.get(APIEndpoints.SEARCH)
+	    request.post(APIEndpoints.SEARCH)
 	      .set('Accept', 'application/json')
+				.send({ search: { word: query } })
 	      .end(function(error, res){
           ActionHelper.dispatch(ActionTypes.SEARCH_RESPONSE, error ,res)
 	      });
@@ -681,6 +682,7 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
     ) : React.createElement("div", null);
 
     var revisions = this.state.post.title ? this.state.post.revisions.map(function(revision, index){
+
       var diffs = revision.diff_text.split('\n').map(function(text, i){
           return (
             React.createElement("p", {key: i}, React.createElement("small", null, text))
@@ -733,6 +735,7 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
         ), 
 
         React.createElement("div", {className: "col-md-4"}, 
+          React.createElement("h3", null, "Revisions."), 
           revisions
         )
 
@@ -1115,7 +1118,26 @@ module.exports = SignupPage;
 },{"../../actions/SessionActionCreators.react.jsx":6,"../../components/common/ErrorNotice.react.jsx":10,"../../stores/SessionStore.react.jsx":25,"react":230}],18:[function(require,module,exports){
 var React = require('react');
 var SearchActionCreators = require('../../actions/SearchActionCreators.react.jsx');
+var PostActionCreators = require('../../actions/PostActionCreators.react.jsx');
+var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var PostStore = require('../../stores/PostStore.react.jsx');
+
+var Result = React.createClass({displayName: "Result",
+  onSelect: function(){
+    PostActionCreators.loadPost(this.props.post.id);
+    RouteActionCreators.redirect("posts");
+  },
+  render: function() {
+    var post = this.props.post;
+    return (
+      React.createElement("div", {className: "col-md-10 col-md-offset-1"}, 
+        React.createElement("h2", null, React.createElement("a", {onClick: this.onSelect}, post.title)), 
+        React.createElement("p", {className: "lead"}, post.body)
+      )
+    )
+  }
+});
+
 
 var SearchResults = React.createClass({displayName: "SearchResults",
   render: function() {
@@ -1129,10 +1151,7 @@ var SearchResults = React.createClass({displayName: "SearchResults",
           this.props.posts.map(function(post, index){
             return (
 
-            React.createElement("div", {key: "post-"+index, className: "col-md-10 col-md-offset-1"}, 
-              React.createElement("h2", null, post.title), 
-              React.createElement("p", {className: "lead"}, post.body)
-            )
+              React.createElement(Result, {post: post, key: post.id})
 
             );
           })
@@ -1206,8 +1225,7 @@ var WelcomePage = React.createClass({displayName: "WelcomePage",
 });
 
 module.exports = WelcomePage;
-
-},{"../../actions/SearchActionCreators.react.jsx":5,"../../stores/PostStore.react.jsx":23,"react":230}],19:[function(require,module,exports){
+},{"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../actions/SearchActionCreators.react.jsx":5,"../../stores/PostStore.react.jsx":23,"react":230}],19:[function(require,module,exports){
 
 //var APIRoot = "http://localhost:8888"; // Local Mock Server
 var APIRoot = "http://localhost:3000";   // Local Backend Server

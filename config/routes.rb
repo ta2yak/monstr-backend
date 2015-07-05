@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
     namespace :v1 do
       # Global Search API
-      get 'search' => 'posts#search'
+      post 'search' => 'search#search'
 
       # POST API
       get 'posts' => 'posts#index'
