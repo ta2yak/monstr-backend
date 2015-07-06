@@ -705,6 +705,8 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
   },
 
   componentDidMount: function() {
+    console.log("componentDidMount")
+    console.log(PostStore.getPost())
     PostStore.addChangeListener(this._onChange);
     this.setState({
         post: PostStore.getPost()
@@ -716,6 +718,8 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
   },
 
   _onChange: function() {
+    console.log("_onChange")
+    console.log(PostStore.getPost())
     this.setState({
         post: PostStore.getPost(),
         errors: PostStore.getErrors()
@@ -744,12 +748,12 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
         React.createElement("div", {className: "panel panel-default", key: index}, 
           React.createElement("div", {className: "panel-heading clearfix"}, 
             React.createElement("h3", {className: "panel-title pull-left"}, 
-              React.createElement("a", {class: "btn btn-primary", role: "button", "data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
+              React.createElement("a", {"data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
                 revision.headline
               )
             ), 
             React.createElement("small", {className: "pull-right"}, 
-              React.createElement("a", {class: "btn btn-primary", role: "button", "data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
+              React.createElement("a", {"data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
                 "More"
               )
             )

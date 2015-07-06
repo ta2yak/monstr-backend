@@ -37,7 +37,7 @@ class Api::V1::PostsController < ApplicationController
 
   def destroy
     @post.destroy
-    head :no_content
+    render json: {status: :deleted}
   end
 
   private
