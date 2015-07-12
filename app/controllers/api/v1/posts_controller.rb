@@ -1,11 +1,10 @@
 class Api::V1::PostsController < ApplicationController
   before_action :authenticate_api_user!, only: [:create, :update, :destroy]
-  before_action :set_post, only: [:update, :destroy]
-  before_action :set_post_with_revisions, only: [:show]
+  before_action :set_post, only: [:show, :update, :destroy]
+  #before_action :set_post_with_revisions, only: [:show]
 
   def index
     @posts = Post.all
-    render json: {status: :success, posts: @posts}
   end
 
   def create
@@ -13,31 +12,29 @@ class Api::V1::PostsController < ApplicationController
     @post = Post.new(post_params)
     @post.user = current_api_user
 
-    if @post.save
-      render json: {status: :created, post: @post}
-    else
-      render json: {errors: {full_messages: @post.errors.full_messages}}, status: :unprocessable_entity
+    unless @post.save
+      @model = @post
+      render :template=>"/api/shared/errors.json.jbuilder", :status=> :unprocessable_entity
+      #render json: {errors: {full_messages: @post.errors.full_messages}}, status: :unprocessable_entity
     end
 
   end
 
   def show
-    render json: {status: :ok, post: @post}
   end
 
   def update
 
-    if @post.update(post_params)
-      render json: {status: :ok, post: @post}
-    else
-      render json: {errors: {full_messages: @post.errors.full_messages}}, status: :unprocessable_entity
+    unless @post.update(post_params)
+      @model = @post
+      render :template=>"/api/shared/errors.json.jbuilder", :status=> :unprocessable_entity
+      #render json: {errors: {full_messages: @post.errors.full_messages}}, status: :unprocessable_entity
     end
 
   end
 
   def destroy
     @post.destroy
-    render json: {status: :deleted}
   end
 
   private

@@ -11,7 +11,8 @@ class Api::V1::IndexController < ApplicationController
     #   }
     # ]
     #
-    render json: {status: :success, indexes: generate_index(Index.roots)}
+    @indexes = generate_index(Index.roots)
+
   end
 
 private

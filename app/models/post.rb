@@ -51,10 +51,6 @@ class Post < ActiveRecord::Base
 
   end
 
-  def as_json(options = {})
-    	super(:include => {:revisions => {}})
-  end
-
 private
 
   def build_revision_message(title, body, is_wip)

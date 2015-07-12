@@ -1,5 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var MonstrAppDispatcher = require('../dispatcher/MonstrAppDispatcher.js');
+var MonstrConstants = require('../constants/MonstrConstants.js');
+var ActionTypes = MonstrConstants.ActionTypes;
 
 var getErrors = function(json){
   if (json['errors']) {
@@ -11,6 +13,14 @@ var getErrors = function(json){
 
 module.exports = {
 
+  setAuthority: function(request){
+    request.set('access-token', sessionStorage.getItem('accessToken'))
+           .set('uid', sessionStorage.getItem('uid'))
+           .set('expiry', sessionStorage.getItem('expiry'))
+           .set('client', sessionStorage.getItem('client'))
+    return request;
+  },
+
   dispatch: function(actionType, error, res){
 
     header = res.header;
@@ -18,19 +28,29 @@ module.exports = {
     json = JSON.parse(res.text);
     errors = getErrors(json);
 
-    MonstrAppDispatcher.handleServerAction({
-      type: actionType,
-      status: status,
-      header: header,
-      json: json,
-      errors: errors
-    });
+    if (status == "401"){
+      MonstrAppDispatcher.handleServerAction({
+        type: ActionTypes.LOGOUT,
+        status: status,
+        header: header,
+        json: json,
+        errors: errors
+      });
+    }else{
+      MonstrAppDispatcher.handleServerAction({
+        type: actionType,
+        status: status,
+        header: header,
+        json: json,
+        errors: errors
+      });
+    }
 
   }
 
 };
 
-},{"../dispatcher/MonstrAppDispatcher.js":20}],2:[function(require,module,exports){
+},{"../constants/MonstrConstants.js":19,"../dispatcher/MonstrAppDispatcher.js":20}],2:[function(require,module,exports){
 var MonstrAppDispatcher = require('../dispatcher/MonstrAppDispatcher.js');
 var MonstrConstants = require('../constants/MonstrConstants.js');
 
@@ -49,16 +69,8 @@ module.exports = {
 
     request.get(APIEndpoints.INDEX + "/all")
       .set('Accept', 'application/json')
-      .set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
       .end(function(error, res){
-        if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-          ActionHelper.dispatch(ActionTypes.RECEIVE_INDEX, error ,res)
-        }
+        ActionHelper.dispatch(ActionTypes.RECEIVE_INDEX, error ,res)
       });
   }
 
@@ -82,18 +94,10 @@ module.exports = {
   		type: ActionTypes.LOAD_POSTS
   	});
 
-    request.get(APIEndpoints.POSTS)
-      .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
+    ActionHelper.setAuthority(request.get(APIEndpoints.POSTS))
+			.set('Accept', 'application/json')
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_POSTS, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_POSTS, error ,res)
       });
 	},
 
@@ -103,18 +107,10 @@ module.exports = {
   		postId: postId
   	});
 
-    request.get(APIEndpoints.POSTS + '/' + postId)
-      .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
+    ActionHelper.setAuthority(request.get(APIEndpoints.POSTS + '/' + postId))
+			.set('Accept', 'application/json')
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_POST, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_POST, error ,res)
       });
 	},
 
@@ -125,19 +121,11 @@ module.exports = {
   		body: body
   	});
 
-    request.post(APIEndpoints.POSTS)
-      .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
+    ActionHelper.setAuthority(request.post(APIEndpoints.POSTS))
+			.set('Accept', 'application/json')
       .send({ post: { title: title, body: body, is_wip: false } })
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
       });
 
 	},
@@ -149,19 +137,11 @@ module.exports = {
       body: body
     });
 
-    request.post(APIEndpoints.POSTS)
-      .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
+    ActionHelper.setAuthority(request.post(APIEndpoints.POSTS))
+			.set('Accept', 'application/json')
       .send({ post: { title: title, body: body, is_wip: true } })
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_CREATED_POST, error ,res)
       });
   },
 
@@ -172,19 +152,11 @@ module.exports = {
   		body: body
   	});
 
-    request.put(APIEndpoints.POSTS + '/' + postId)
+    ActionHelper.setAuthority(request.put(APIEndpoints.POSTS + '/' + postId))
       .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
       .send({ post: { title: title, body: body, is_wip: false } })
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
       });
 
 	},
@@ -196,19 +168,11 @@ module.exports = {
       body: body
     });
 
-    request.put(APIEndpoints.POSTS + '/' + postId)
+    ActionHelper.setAuthority(request.put(APIEndpoints.POSTS + '/' + postId))
       .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
       .send({ post: { title: title, body: body, is_wip: true } })
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_POST, error ,res)
       });
   },
 
@@ -217,18 +181,10 @@ module.exports = {
       type: ActionTypes.DELETE_POST
     });
 
-    request.del(APIEndpoints.POSTS + '/' + postId)
+    ActionHelper.setAuthority(request.del(APIEndpoints.POSTS + '/' + postId))
       .set('Accept', 'application/json')
-			.set('access-token', sessionStorage.getItem('accessToken'))
-      .set('uid', sessionStorage.getItem('uid'))
-      .set('expiry', sessionStorage.getItem('expiry'))
-      .set('client', sessionStorage.getItem('client'))
       .end(function(error, res){
-				if (res.status == "401"){
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					ActionHelper.dispatch(ActionTypes.RECEIVE_DELETED_POST, error ,res)
-        }
+				ActionHelper.dispatch(ActionTypes.RECEIVE_DELETED_POST, error ,res)
       });
   }
 
@@ -387,6 +343,7 @@ var Menu = React.createClass({displayName: "Menu",
     var menuItems = this.props.isLoggedIn ? (
 
       React.createElement("div", {className: "btn-group-justified"}, 
+        React.createElement("div", {className: "spacer"}), 
         React.createElement(Link, {to: "welcome"}, 
           React.createElement("button", {className: "btn btn-xs btn-primary btn-block"}, 
             React.createElement("i", {className: "glyphicon glyphicon-home"}), 
@@ -421,6 +378,7 @@ var Menu = React.createClass({displayName: "Menu",
     ) : (
 
       React.createElement("div", {className: "btn-group-justified"}, 
+        React.createElement("div", {className: "spacer"}), 
         React.createElement(Link, {to: "welcome"}, 
           React.createElement("button", {className: "btn btn-xs btn-primary btn-block"}, 
             React.createElement("i", {className: "glyphicon glyphicon-home"}), 
@@ -435,6 +393,7 @@ var Menu = React.createClass({displayName: "Menu",
             "POSTS"
           )
         ), 
+        React.createElement("div", {className: "spacer"}), 
         React.createElement(Link, {to: "login"}, 
           React.createElement("button", {className: "btn btn-xs btn-primary btn-block"}, 
             React.createElement("i", {className: "glyphicon glyphicon-log-in"}), 
@@ -455,7 +414,7 @@ var Menu = React.createClass({displayName: "Menu",
 
     return (
 
-      React.createElement("div", {className: "menu spacer well-material-teal-500"}, 
+      React.createElement("div", {className: "menu well-material-teal-500"}, 
         menuItems
       )
 
@@ -501,7 +460,7 @@ var MonstrApp = React.createClass({displayName: "MonstrApp",
     return (
       React.createElement("div", {className: "app container"}, 
         React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-md-1"}, 
+          React.createElement("div", {className: "col-md-1 menu-container"}, 
             React.createElement(Menu, {isLoggedIn: this.state.isLoggedIn})
           ), 
           React.createElement("div", {className: "col-md-11"}, 
@@ -701,12 +660,10 @@ var moment = require('moment');
 var PostIndexPage = React.createClass({displayName: "PostIndexPage",
 
   getInitialState: function() {
-    return { post: [], errors: [] };
+    return { post: null, errors: [] };
   },
 
   componentDidMount: function() {
-    console.log("componentDidMount")
-    console.log(PostStore.getPost())
     PostStore.addChangeListener(this._onChange);
     this.setState({
         post: PostStore.getPost()
@@ -718,8 +675,6 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
   },
 
   _onChange: function() {
-    console.log("_onChange")
-    console.log(PostStore.getPost())
     this.setState({
         post: PostStore.getPost(),
         errors: PostStore.getErrors()
@@ -728,14 +683,15 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
 
   render: function() {
     var errors = (this.state.errors.length > 0) ? React.createElement(ErrorNotice, {errors: this.state.errors}) : React.createElement("div", null);
-    var html = this.state.post.body ? markdown.toHTML(this.state.post.body) : ""
-    var editButton = (SessionStore.isLoggedIn() && this.state.post.title) ? (
+    var title = this.state.post ? this.state.post.title : "";
+    var html = this.state.post ? markdown.toHTML(this.state.post.body) : "";
+    var editButton = (SessionStore.isLoggedIn() && this.state.post) ? (
       React.createElement(Link, {to: "edit-post"}, 
         React.createElement("button", {className: "btn btn-primary pull-right", type: "button"}, "修正する")
       )
     ) : React.createElement("div", null);
 
-    var revisions = this.state.post.title ? this.state.post.revisions.map(function(revision, index){
+    var revisions = this.state.post ? this.state.post.revisions.map(function(revision, index){
 
       var diffs = revision.diff_text.split('\n').map(function(text, i){
           return (
@@ -784,7 +740,7 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
         React.createElement("div", {className: "col-md-6"}, 
 
           React.createElement("div", {className: "col-md-12"}, 
-            React.createElement("h1", null, this.state.post.title)
+            React.createElement("h1", null, title)
           ), 
 
           React.createElement("div", {className: "col-md-12"}, 
@@ -856,7 +812,7 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
 
   _genNode: function(nodes){
 
-    var selectedPost = this.state.currentPost;
+    var selectedPostID = this.state.currentPost ? this.state.currentPost.id : null;
 
     var navTree = function(nodes, depth){
 
@@ -889,7 +845,13 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
 
         }else{
 
-          var selected = (selectedPost.id == node.post) ? "selected" : ""
+          // ここで selectedPostID が存在しない場合は1つめのPostを表示する
+          if (!selectedPostID){
+            selectedPostID = node.post;
+            PostActionCreators.loadPost(selectedPostID);
+          }
+
+          var selected = (selectedPostID == node.post) ? "selected" : ""
           return (
             React.createElement("div", {className: "accordion-inner", key: node.id}, 
               indents, 
@@ -1511,7 +1473,7 @@ var CHANGE_EVENT = 'change';
 var _posts = [];
 var _errors = [];
 var _successes= [];
-var _post = {};
+var _post = null;
 
 var PostStore = assign({}, EventEmitter.prototype, {
 
@@ -1592,7 +1554,7 @@ PostStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
       if (action.errors) {
         _errors = action.errors;
       }else{
-        _post = {}
+        _post = null;
       _successes = ["削除しました"];
       }
       PostStore.emitChange();

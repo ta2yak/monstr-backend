@@ -7851,6 +7851,9 @@ body {
   margin-top: 40px;
   /* define margin as you see fit */
 }
+.menu-container {
+  padding-left: 0px;
+}
 .menu {
   border: 1px;
   border-color: #009688;
