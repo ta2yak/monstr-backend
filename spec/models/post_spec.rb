@@ -36,7 +36,7 @@ RSpec.describe Post, type: :model do
     @post.update(FactoryGirl.attributes_for(:post_rev2))
     @post.update(FactoryGirl.attributes_for(:post_rev3))
     @post.update(FactoryGirl.attributes_for(:post_rev4))
-    expect(@post.revisions.tapp.count).to match 4
+    expect(@post.revisions.count).to match 4
   end
 
 end

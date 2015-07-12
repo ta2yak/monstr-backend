@@ -33,10 +33,6 @@ RSpec.describe Index, type: :model do
     child2.destroy
 
     parent = Index.find_or_create_by_path(%w[grandparent])
-    p "*****************************************************"
-    p parent
-    p parent.reload.children.pluck(:name)
-    p "*****************************************************"
     expect(parent.child_ids.length).to match 1
   end
 
