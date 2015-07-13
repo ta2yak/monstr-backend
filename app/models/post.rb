@@ -42,7 +42,7 @@ class Post < ActiveRecord::Base
       new_text = build_revision_message(post.title, post.body, post.is_wip)
       prev_text = build_revision_message(post.title_was, post.body_was, post.is_wip_was)
 
-      headline = Diffy::Diff.new(prev_text, new_text, :context => 0).first.chomp
+      headline = post.id_changed? ? "#{post.user_id} Created Post." : "#{post.user_id} Updated Post."
       diff_text = Diffy::Diff.new(prev_text, new_text, :context => 5).to_s(:text)
 
       Revision.create({headline:headline, full_text:new_text, diff_text:diff_text, user:post.user, post:post})
