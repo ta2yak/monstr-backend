@@ -11,6 +11,10 @@ Rails.application.routes.draw do
       # Global Search API
       post 'search' => 'search#search'
 
+      # USER API
+      get 'me' => 'users#show'
+      put 'me' => 'users#update'
+
       # POST API
       get 'posts' => 'posts#index'
       get 'posts/:id' => 'posts#show'
