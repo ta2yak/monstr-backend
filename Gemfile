@@ -52,6 +52,9 @@ gem 'dotenv', '~> 2.0.1'
 gem 'closure_tree'
 # diff
 gem 'diffy'
+# Image Uploader
+gem 'carrierwave'
+gem 'mini_magick'
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'
