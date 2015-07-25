@@ -1,2 +1,2 @@
 json.set! :status, :success
-json.user @resource, :name, :nickname, :image
+json.user @resource, :name, :avatar

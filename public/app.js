@@ -358,19 +358,38 @@ module.exports = {
 			avatar: avatar
   	});
 
-    ActionHelper.setAuthority(request.put(APIEndpoints.USERS))
-      .set('Accept', 'application/json')
-			//.attach('user:avatar', avatar)
-      .send({ user: { name: name } })
-      .end(function(error, res){
-				if (res.status == "401"){
-          console.log("User Update Action 401");
-          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
-        }else{
-					console.log("User Update Action 200");
-					ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_USER, error ,res)
-        }
-      });
+		if (avatar) {
+
+			ActionHelper.setAuthority(request.put(APIEndpoints.USERS))
+	      .set('Accept', 'application/json')
+				.field('user[name]', name)
+				.attach('user[avatar]', avatar, avatar.name)
+	      .end(function(error, res){
+					if (res.status == "401"){
+	          console.log("User Update Action 401");
+	          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+	        }else{
+						console.log("User Update Action 200");
+						ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_USER, error ,res)
+	        }
+	      });
+
+		}else{
+
+			ActionHelper.setAuthority(request.put(APIEndpoints.USERS))
+	      .set('Accept', 'application/json')
+				.field('user[name]', name)
+	      .end(function(error, res){
+					if (res.status == "401"){
+	          console.log("User Update Action 401");
+	          ActionHelper.dispatch(ActionTypes.LOGOUT, error ,res)
+	        }else{
+						console.log("User Update Action 200");
+						ActionHelper.dispatch(ActionTypes.RECEIVE_UPDATED_USER, error ,res)
+	        }
+	      });
+
+		}
 
 	},
 
@@ -1447,7 +1466,10 @@ var UserEditPage = React.createClass({displayName: "UserEditPage",
     if (UserStore.isError()){
       this.setState({errors: UserStore.getErrors()});
     }else{
-      this.setState({successes: UserStore.getSuccesses()});
+      this.setState({
+                      successes: UserStore.getSuccesses(),
+                      user:UserStore.getCurrentUser()
+                    });
     }
   },
 
@@ -1467,7 +1489,7 @@ var UserEditPage = React.createClass({displayName: "UserEditPage",
     var errors = (this.state.errors.length > 0) ? React.createElement(ErrorNotice, {errors: this.state.errors}) : React.createElement("div", null);
     var successes = (this.state.successes.length > 0) ? React.createElement(SuccessNotice, {successes: this.state.successes}) : React.createElement("div", null);
     var preview = (this.state.selectedAvatarFile) ? React.createElement("img", {className: "img-thumbnail", src: this.state.selectedAvatarFile.preview}) : React.createElement("div", null, "ここに画像をドロップ");
-    var currentAvatar = (this.state.user.avatar) ? React.createElement("img", {className: "img-thumbnail", src: this.state.user.avatar.thumb.url}) : React.createElement("div", null);
+    var currentAvatar = (this.state.user.avatar) ? React.createElement("img", {className: "img-thumbnail", src: this.state.user.avatar.avatar.thumb.url}) : React.createElement("div", null);
 
     return (
 
