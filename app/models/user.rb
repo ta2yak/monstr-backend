@@ -6,5 +6,7 @@ class User < ActiveRecord::Base
   # , :omniauthable
   include DeviseTokenAuth::Concerns::User
 
+  mount_uploader :avatar, AvatarUploader
+  
   has_many :posts, dependent: :destroy
 end

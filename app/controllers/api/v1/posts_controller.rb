@@ -4,7 +4,6 @@ class Api::V1::PostsController < ApplicationController
 
   def index
     @posts = Post.all
-    render json: {status: :success, posts: @posts}
   end
 
   def create
@@ -12,36 +11,27 @@ class Api::V1::PostsController < ApplicationController
     @post = Post.new(post_params)
     @post.user = current_api_user
 
-    if @post.save
-      render json: {status: :created}
-    else
-      render json: @post.errors, status: :unprocessable_entity
+    unless @post.save
+      @model = @post
+      render :template=>"/api/shared/errors.json.jbuilder", :status=> :unprocessable_entity
     end
 
   end
 
   def show
-    render json: {status: :ok, post: @post}
   end
 
   def update
 
-    if @post.update(post_params)
-      render json: {status: :ok}
-    else
-      render json: @post.errors, status: :unprocessable_entity
+    unless @post.update(post_params)
+      @model = @post
+      render :template=>"/api/shared/errors.json.jbuilder", :status=> :unprocessable_entity
     end
 
   end
 
   def destroy
     @post.destroy
-    head :no_content
-  end
-
-  def search
-    @posts = Post.all
-    render json: {status: :success, posts: @posts}
   end
 
   private

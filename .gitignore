@@ -4,6 +4,7 @@ ra-*.html
 /tmp
 /db/*.sqlite3
 /public/system
+/public/uploads
 /coverage/
 /spec/tmp
 **.orig
@@ -38,4 +39,3 @@ doc/
 .DS_Store
 .idea
 .secret
-

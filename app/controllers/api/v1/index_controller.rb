@@ -1,5 +1,4 @@
 class Api::V1::IndexController < ApplicationController
-  before_action :authenticate_api_user!
 
   def all
 
@@ -12,7 +11,8 @@ class Api::V1::IndexController < ApplicationController
     #   }
     # ]
     #
-    render json: {status: :success, indexes: generate_index(Index.roots).tapp}
+    @indexes = generate_index(Index.roots)
+
   end
 
 private
