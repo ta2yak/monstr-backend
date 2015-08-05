@@ -415,10 +415,34 @@ var Link = Router.Link;
 var SessionActionCreators = require('../actions/SessionActionCreators.react.jsx');
 var RouteActionCreators = require('../actions/RouteActionCreators.react.jsx');
 
+var SessionStore = require('../stores/SessionStore.react.jsx');
+var UserStore = require('../stores/UserStore.react.jsx');
+
+function getStateFromStores() {
+  return {
+    isLoggedIn: SessionStore.isLoggedIn(),
+    currentUser: UserStore.getCurrentUser()
+  };
+}
+
 var Menu = React.createClass({displayName: "Menu",
 
-  propTypes: {
-    isLoggedIn: React.PropTypes.bool
+  getInitialState: function() {
+    return getStateFromStores();
+  },
+
+  componentDidMount: function() {
+    SessionStore.addChangeListener(this._onChange);
+    UserStore.addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function() {
+    SessionStore.removeChangeListener(this._onChange);
+    UserStore.removeChangeListener(this._onChange);
+  },
+
+  _onChange: function() {
+    this.setState(getStateFromStores());
   },
 
   _logout: function(e) {
@@ -428,10 +452,20 @@ var Menu = React.createClass({displayName: "Menu",
   },
 
   render: function() {
-    var menuItems = this.props.isLoggedIn ? (
+    var picture = "";
+    var name = "";
+    if (this.state.currentUser) {
+      picture = this.state.currentUser.avatar ? this.state.currentUser.avatar.avatar.thumb.url : "http://lorempixel.com/56/56/people/6";
+      name = this.state.currentUser.name;
+    }
+    var menuItems = this.state.isLoggedIn ? (
 
       React.createElement("div", {className: "btn-group-justified"}, 
-        React.createElement("div", {className: "spacer"}), 
+        React.createElement(Link, {to: "welcome"}, 
+          React.createElement("button", {className: "btn btn-xs btn-primary btn-block"}, 
+            React.createElement("img", {className: "img-circle", src: picture, alt: "icon"})
+          )
+        ), 
         React.createElement(Link, {to: "welcome"}, 
           React.createElement("button", {className: "btn btn-xs btn-primary btn-block"}, 
             React.createElement("i", {className: "mdi-action-search"}), 
@@ -522,43 +556,20 @@ var Menu = React.createClass({displayName: "Menu",
 
 module.exports = Menu;
 
-},{"../actions/RouteActionCreators.react.jsx":4,"../actions/SessionActionCreators.react.jsx":6,"react":234,"react-router":66}],10:[function(require,module,exports){
+},{"../actions/RouteActionCreators.react.jsx":4,"../actions/SessionActionCreators.react.jsx":6,"../stores/SessionStore.react.jsx":27,"../stores/UserStore.react.jsx":28,"react":234,"react-router":66}],10:[function(require,module,exports){
 var React = require('react');
 var RouteHandler = require('react-router').RouteHandler;
 var Menu = require('../components/Menu.react.jsx');
-var SessionStore = require('../stores/SessionStore.react.jsx');
 var RouteStore = require('../stores/RouteStore.react.jsx');
 
-function getStateFromStores() {
-  return {
-    isLoggedIn: SessionStore.isLoggedIn()
-  };
-}
-
 var MonstrApp = React.createClass({displayName: "MonstrApp",
-
-  getInitialState: function() {
-    return getStateFromStores();
-  },
-
-  componentDidMount: function() {
-    SessionStore.addChangeListener(this._onChange);
-  },
-
-  componentWillUnmount: function() {
-    SessionStore.removeChangeListener(this._onChange);
-  },
-
-  _onChange: function() {
-    this.setState(getStateFromStores());
-  },
 
   render: function() {
     return (
       React.createElement("div", {className: "app container fill"}, 
         React.createElement("div", {className: "row fill"}, 
           React.createElement("div", {className: "col-md-1 menu-container fill"}, 
-            React.createElement(Menu, {isLoggedIn: this.state.isLoggedIn})
+            React.createElement(Menu, null)
           ), 
           React.createElement("div", {className: "col-md-11 fill content-container"}, 
             React.createElement("div", {className: "row fill"}, 
@@ -574,7 +585,7 @@ var MonstrApp = React.createClass({displayName: "MonstrApp",
 
 module.exports = MonstrApp;
 
-},{"../components/Menu.react.jsx":9,"../stores/RouteStore.react.jsx":26,"../stores/SessionStore.react.jsx":27,"react":234,"react-router":66}],11:[function(require,module,exports){
+},{"../components/Menu.react.jsx":9,"../stores/RouteStore.react.jsx":26,"react":234,"react-router":66}],11:[function(require,module,exports){
 var React = require('react');
 var moment = require('moment');
 
@@ -953,8 +964,10 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
             React.createElement("div", {className: "accordion-group", key: node.id}, 
               React.createElement("div", {className: "accordion-heading"}, 
                 indents, 
+                React.createElement("small", null, 
                 React.createElement("a", {className: "accordion-toggle", "data-toggle": "collapse", href: "#collapse-"+node.id}, 
                   React.createElement("i", {className: "mdi-file-folder-open"}), " ", node.title
+                )
                 )
               ), 
               React.createElement("div", {id: "collapse-"+node.id, className: "accordion-body collapse in"}, 
@@ -975,8 +988,10 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
           return (
             React.createElement("div", {className: "accordion-inner", key: node.id}, 
               indents, 
+              React.createElement("small", null, 
               React.createElement("a", {className: selected, onClick: onSelect.bind(this, node.post)}, 
                 React.createElement("i", {className: "mdi-action-description"}), " ", node.title
+              )
               )
             )
           );
@@ -1469,6 +1484,7 @@ var UserEditPage = React.createClass({displayName: "UserEditPage",
     }else{
       this.setState({
                       successes: UserStore.getSuccesses(),
+                      selectedAvatarFile: null,
                       user:UserStore.getCurrentUser()
                     });
     }
@@ -1489,8 +1505,8 @@ var UserEditPage = React.createClass({displayName: "UserEditPage",
   render: function() {
     var errors = (this.state.errors.length > 0) ? React.createElement(ErrorNotice, {errors: this.state.errors}) : React.createElement("div", null);
     var successes = (this.state.successes.length > 0) ? React.createElement(SuccessNotice, {successes: this.state.successes}) : React.createElement("div", null);
-    var preview = (this.state.selectedAvatarFile) ? React.createElement("img", {className: "img-thumbnail", src: this.state.selectedAvatarFile.preview}) : React.createElement("div", null, "ここに画像をドロップ");
-    var currentAvatar = (this.state.user.avatar) ? React.createElement("img", {className: "img-thumbnail", src: this.state.user.avatar.avatar.thumb.url}) : React.createElement("div", null);
+    var currentAvatar = (this.state.user.avatar) ? React.createElement("img", {className: "img-thumbnail", src: this.state.user.avatar.avatar.url}) : React.createElement("div", null);
+    var preview = (this.state.selectedAvatarFile) ? React.createElement("img", {className: "img-thumbnail", src: this.state.selectedAvatarFile.preview}) : currentAvatar;
 
     return (
 
@@ -1499,25 +1515,27 @@ var UserEditPage = React.createClass({displayName: "UserEditPage",
         successes, 
         errors, 
 
-        React.createElement("div", {className: "col-md-6 col-md-offset-3"}, 
-
-          React.createElement("div", {className: "col-md-3"}, 
-            React.createElement(Dropzone, {onDrop: this._onDrop, size: 150}, 
-              preview
-            )
-          ), 
-
-          React.createElement("div", {className: "col-md-9"}, 
-            React.createElement("div", {className: "col-md-12"}, 
-              currentAvatar, 
-              React.createElement("input", {type: "text", 　ref: "name", defaultValue: this.state.user.name, className: "form-control floating-label", placeholder: "名前"})
+        React.createElement("div", {className: "col-md-10 col-md-offset-1"}, 
+            React.createElement("div", {className: "col-md-3"}, 
+              React.createElement(Dropzone, {onDrop: this._onDrop, size: 150}, 
+                preview
+              )
             ), 
-            React.createElement("div", {className: "col-md-12"}, 
-              React.createElement("button", {className: "btn btn-primary pull-right", type: "button", onClick: this._onUpdate}, "更新")
+
+            React.createElement("div", {className: "col-md-6"}, 
+
+              React.createElement("div", {className: "col-md-12 spacer"}, 
+                React.createElement("input", {type: "text", ref: "name", defaultValue: this.state.user.name, className: "form-control", placeholder: "名前"})
+              ), 
+
+              React.createElement("div", {className: "col-md-12 spacer"}, 
+                React.createElement("button", {className: "btn btn-primary pull-right", type: "button", onClick: this._onUpdate}, "更新")
+              )
+
             )
-          )
 
         )
+
       )
 
     );
