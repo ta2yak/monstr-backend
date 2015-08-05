@@ -8,7 +8,7 @@ json.post do
   json.revisions do
     json.array! @post.revisions do |revision|
       json.merge! revision.attributes
-      json.user revision.user, :name, :nickname, :image
+      json.user revision.user, :name, :avatar
     end
   end
 

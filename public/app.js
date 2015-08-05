@@ -710,7 +710,7 @@ var PostEditPage = React.createClass({displayName: "PostEditPage",
             React.createElement("input", {type: "text", 　ref: "title", defaultValue: this.state.post.title, className: "form-control floating-label input-lg", placeholder: "title (/ により階層分類が可能です ex. Application/Setup/Install)"})
           ), 
           React.createElement("div", {className: "col-md-12 spacer"}, 
-            React.createElement("textarea", {　ref: "body", defaultValue: this.state.post.body, className: "form-control floating-label", placeholder: "Markdown Text", onChange: this._onUpdateMarkdown, rows: "20"})
+            React.createElement("textarea", {　ref: "body", defaultValue: this.state.post.body, className: "form-control floating-label", placeholder: "Markdown Text", onChange: this._onUpdateMarkdown, rows: "30"})
           ), 
 
           React.createElement("div", {className: "col-md-12"}, 
@@ -789,6 +789,12 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
         React.createElement("button", {className: "btn btn-primary pull-right", type: "button"}, "修正する")
       )
     ) : React.createElement("div", null);
+    var actions = (
+      React.createElement("div", {className: "col-md-6 col-md-offset-6"}, 
+        editButton, 
+        React.createElement("button", {type: "button", className: "btn btn-default pull-right", "data-toggle": "modal", "data-target": ".bs-rev-modal-lg"}, "Revisions")
+      )
+    );
 
     var revisions = this.state.post ? this.state.post.revisions.map(function(revision, index){
 
@@ -798,30 +804,32 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
           )
       });
 
+      var picture = revision.user.avatar ? revision.user.avatar.avatar.thumb.url : "http://lorempixel.com/56/56/people/6";
+
       return (
 
-        React.createElement("div", {className: "panel panel-default", key: index}, 
-          React.createElement("div", {className: "panel-heading clearfix"}, 
-            React.createElement("h3", {className: "panel-title pull-left"}, 
+      React.createElement("div", null, 
+        React.createElement("div", {className: "list-group-item", key: index}, 
+
+          React.createElement("div", {className: "row-picture"}, 
+            React.createElement("img", {className: "circle", src: picture, alt: "icon"})
+          ), 
+
+          React.createElement("div", {className: "row-content"}, 
+            React.createElement("div", {className: "least-content"}, moment(revision.created_at).fromNow()), 
+            React.createElement("h4", {className: "list-group-item-heading"}, 
               React.createElement("a", {"data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
                 revision.headline
               )
             ), 
-            React.createElement("small", {className: "pull-right"}, 
-              React.createElement("a", {"data-toggle": "collapse", href: "#collapse"+index, "aria-expanded": "false", "aria-controls": "collapse"+index}, 
-                "More"
-              )
-            )
-          ), 
-          React.createElement("div", {className: "panel-body collapse", id: "collapse"+index}, 
-            diffs
-          ), 
-          React.createElement("div", {className: "panel-footer"}, 
-            React.createElement("small", {className: "pull-right"}, 
-              moment(revision.created_at).fromNow()
+            React.createElement("div", {className: "list-group-item-text collapse", id: "collapse"+index}, 
+              diffs
             )
           )
-        )
+
+        ), 
+        React.createElement("div", {className: "list-group-separator"})
+      )
 
       )
     }) : React.createElement("div", null);
@@ -838,28 +846,36 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
           )
         ), 
 
-        React.createElement("div", {className: "col-md-6 fill content-container"}, 
-          React.createElement("div", {className: "spacer"}, 
+        React.createElement("div", {className: "col-md-10 fill content-container"}, 
 
-            React.createElement("div", {className: "col-md-12"}, 
-              React.createElement("h3", null, title), 
-              React.createElement("div", {dangerouslySetInnerHTML: {__html: html}})
-            ), 
+          React.createElement("div", {className: "col-md-12"}, 
+            actions
+          ), 
 
-            React.createElement("div", {className: "col-md-12"}, 
-              React.createElement("div", {className: "col-md-6 col-md-offset-6"}, 
-                editButton
-              )
-            )
+          React.createElement("div", {className: "col-md-12"}, 
+            React.createElement("h1", null, title), 
+            React.createElement("hr", null), 
+            React.createElement("div", {dangerouslySetInnerHTML: {__html: html}})
+          ), 
 
+          React.createElement("div", {className: "col-md-12"}, 
+            actions
           )
+
         ), 
 
-        React.createElement("div", {className: "col-md-4 fill content-container"}, 
-          React.createElement("div", {className: "spacer"}, 
-            React.createElement("div", {className: "col-md-12"}, 
-              React.createElement("h3", null, "Revisions."), 
-              revisions
+        React.createElement("div", {className: "modal fade bs-rev-modal-lg", tabindex: "-1", role: "dialog", "aria-labelledby": "myRevModalLabel"}, 
+          React.createElement("div", {className: "modal-dialog modal-lg"}, 
+            React.createElement("div", {classNmae: "modal-content"}, 
+              React.createElement("div", {className: "panel panel-default"}, 
+                React.createElement("div", {className: "panel-heading clearfix"}, 
+                  React.createElement("h3", {className: "panel-title pull-left"}, "Revisions")
+                ), 
+                React.createElement("div", {className: "spacer"}), 
+                React.createElement("div", {className: "list-group"}, 
+                revisions
+                )
+              )
             )
           )
         )
@@ -1065,7 +1081,7 @@ var PostNewPage = React.createClass({displayName: "PostNewPage",
           ), 
 
           React.createElement("div", {className: "col-md-12 spacer"}, 
-            React.createElement("textarea", {　ref: "body", className: "form-control floating-label", placeholder: "Markdown Text", onInput: this._onUpdateMarkdown, rows: "20"})
+            React.createElement("textarea", {　ref: "body", className: "form-control floating-label", placeholder: "Markdown Text", onInput: this._onUpdateMarkdown, rows: "30"})
           ), 
 
           React.createElement("div", {className: "col-md-12"}, 
@@ -1512,7 +1528,7 @@ module.exports = UserEditPage;
 },{"../../actions/RouteActionCreators.react.jsx":4,"../../actions/SessionActionCreators.react.jsx":6,"../../actions/UserActionCreators.react.jsx":7,"../../components/common/ErrorNotice.react.jsx":11,"../../components/common/SuccessNotice.react.jsx":12,"../../stores/SessionStore.react.jsx":27,"../../stores/UserStore.react.jsx":28,"react":234,"react-dropzone":41}],21:[function(require,module,exports){
 
 //var APIRoot = "http://localhost:8888"; // Local Mock Server
-var APIRoot = "http://localhost:3000";   // Local Backend Server
+var APIRoot = "http://172.16.100.221";   // Local Backend Server
 
 module.exports = {
 
@@ -5174,7 +5190,7 @@ function merge_text_nodes( jsonml ) {
 
 },{"util":33}],39:[function(require,module,exports){
 //! moment.js
-//! version : 2.10.3
+//! version : 2.10.6
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -5269,6 +5285,7 @@ function merge_text_nodes( jsonml ) {
                 flags.overflow < 0 &&
                 !flags.empty &&
                 !flags.invalidMonth &&
+                !flags.invalidWeekday &&
                 !flags.nullInput &&
                 !flags.invalidFormat &&
                 !flags.userInvalidated;
@@ -5349,7 +5366,7 @@ function merge_text_nodes( jsonml ) {
     // Moment prototype object
     function Moment(config) {
         copyConfig(this, config);
-        this._d = new Date(+config._d);
+        this._d = new Date(config._d != null ? config._d.getTime() : NaN);
         // Prevent infinite loop in case updateOffset creates new moment
         // objects.
         if (updateInProgress === false) {
@@ -5363,16 +5380,20 @@ function merge_text_nodes( jsonml ) {
         return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
     }
 
+    function absFloor (number) {
+        if (number < 0) {
+            return Math.ceil(number);
+        } else {
+            return Math.floor(number);
+        }
+    }
+
     function toInt(argumentForCoercion) {
         var coercedNumber = +argumentForCoercion,
             value = 0;
 
         if (coercedNumber !== 0 && isFinite(coercedNumber)) {
-            if (coercedNumber >= 0) {
-                value = Math.floor(coercedNumber);
-            } else {
-                value = Math.ceil(coercedNumber);
-            }
+            value = absFloor(coercedNumber);
         }
 
         return value;
@@ -5470,9 +5491,7 @@ function merge_text_nodes( jsonml ) {
     function defineLocale (name, values) {
         if (values !== null) {
             values.abbr = name;
-            if (!locales[name]) {
-                locales[name] = new Locale();
-            }
+            locales[name] = locales[name] || new Locale();
             locales[name].set(values);
 
             // backwards compat for now: also set the locale
@@ -5576,16 +5595,14 @@ function merge_text_nodes( jsonml ) {
     }
 
     function zeroFill(number, targetLength, forceSign) {
-        var output = '' + Math.abs(number),
+        var absNumber = '' + Math.abs(number),
+            zerosToFill = targetLength - absNumber.length,
             sign = number >= 0;
-
-        while (output.length < targetLength) {
-            output = '0' + output;
-        }
-        return (sign ? (forceSign ? '+' : '') : '-') + output;
+        return (sign ? (forceSign ? '+' : '') : '-') +
+            Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
     }
 
-    var formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|x|X|zz?|ZZ?|.)/g;
+    var formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
 
     var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
 
@@ -5653,10 +5670,7 @@ function merge_text_nodes( jsonml ) {
         }
 
         format = expandFormat(format, m.localeData());
-
-        if (!formatFunctions[format]) {
-            formatFunctions[format] = makeFormatFunction(format);
-        }
+        formatFunctions[format] = formatFunctions[format] || makeFormatFunction(format);
 
         return formatFunctions[format](m);
     }
@@ -5700,8 +5714,15 @@ function merge_text_nodes( jsonml ) {
 
     var regexes = {};
 
+    function isFunction (sth) {
+        // https://github.com/moment/moment/issues/2325
+        return typeof sth === 'function' &&
+            Object.prototype.toString.call(sth) === '[object Function]';
+    }
+
+
     function addRegexToken (token, regex, strictRegex) {
-        regexes[token] = typeof regex === 'function' ? regex : function (isStrict) {
+        regexes[token] = isFunction(regex) ? regex : function (isStrict) {
             return (isStrict && strictRegex) ? strictRegex : regex;
         };
     }
@@ -5909,12 +5930,11 @@ function merge_text_nodes( jsonml ) {
     }
 
     function deprecate(msg, fn) {
-        var firstTime = true,
-            msgWithStack = msg + '\n' + (new Error()).stack;
+        var firstTime = true;
 
         return extend(function () {
             if (firstTime) {
-                warn(msgWithStack);
+                warn(msg + '\n' + (new Error()).stack);
                 firstTime = false;
             }
             return fn.apply(this, arguments);
@@ -5962,14 +5982,14 @@ function merge_text_nodes( jsonml ) {
             getParsingFlags(config).iso = true;
             for (i = 0, l = isoDates.length; i < l; i++) {
                 if (isoDates[i][1].exec(string)) {
-                    // match[5] should be 'T' or undefined
-                    config._f = isoDates[i][0] + (match[6] || ' ');
+                    config._f = isoDates[i][0];
                     break;
                 }
             }
             for (i = 0, l = isoTimes.length; i < l; i++) {
                 if (isoTimes[i][1].exec(string)) {
-                    config._f += isoTimes[i][0];
+                    // match[6] should be 'T' or space
+                    config._f += (match[6] || ' ') + isoTimes[i][0];
                     break;
                 }
             }
@@ -6048,7 +6068,10 @@ function merge_text_nodes( jsonml ) {
     addRegexToken('YYYYY',  match1to6, match6);
     addRegexToken('YYYYYY', match1to6, match6);
 
-    addParseToken(['YYYY', 'YYYYY', 'YYYYYY'], YEAR);
+    addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+    addParseToken('YYYY', function (input, array) {
+        array[YEAR] = input.length === 2 ? utils_hooks__hooks.parseTwoDigitYear(input) : toInt(input);
+    });
     addParseToken('YY', function (input, array) {
         array[YEAR] = utils_hooks__hooks.parseTwoDigitYear(input);
     });
@@ -6175,18 +6198,18 @@ function merge_text_nodes( jsonml ) {
 
     //http://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
     function dayOfYearFromWeeks(year, week, weekday, firstDayOfWeekOfYear, firstDayOfWeek) {
-        var d = createUTCDate(year, 0, 1).getUTCDay();
-        var daysToAdd;
-        var dayOfYear;
+        var week1Jan = 6 + firstDayOfWeek - firstDayOfWeekOfYear, janX = createUTCDate(year, 0, 1 + week1Jan), d = janX.getUTCDay(), dayOfYear;
+        if (d < firstDayOfWeek) {
+            d += 7;
+        }
 
-        d = d === 0 ? 7 : d;
-        weekday = weekday != null ? weekday : firstDayOfWeek;
-        daysToAdd = firstDayOfWeek - d + (d > firstDayOfWeekOfYear ? 7 : 0) - (d < firstDayOfWeek ? 7 : 0);
-        dayOfYear = 7 * (week - 1) + (weekday - firstDayOfWeek) + daysToAdd + 1;
+        weekday = weekday != null ? 1 * weekday : firstDayOfWeek;
+
+        dayOfYear = 1 + week1Jan + 7 * (week - 1) - d + weekday;
 
         return {
-            year      : dayOfYear > 0 ? year      : year - 1,
-            dayOfYear : dayOfYear > 0 ? dayOfYear : daysInYear(year - 1) + dayOfYear
+            year: dayOfYear > 0 ? year : year - 1,
+            dayOfYear: dayOfYear > 0 ?  dayOfYear : daysInYear(year - 1) + dayOfYear
         };
     }
 
@@ -6472,9 +6495,19 @@ function merge_text_nodes( jsonml ) {
     }
 
     function createFromConfig (config) {
+        var res = new Moment(checkOverflow(prepareConfig(config)));
+        if (res._nextDay) {
+            // Adding is smart enough around DST
+            res.add(1, 'd');
+            res._nextDay = undefined;
+        }
+
+        return res;
+    }
+
+    function prepareConfig (config) {
         var input = config._i,
-            format = config._f,
-            res;
+            format = config._f;
 
         config._locale = config._locale || locale_locales__getLocale(config._l);
 
@@ -6498,14 +6531,7 @@ function merge_text_nodes( jsonml ) {
             configFromInput(config);
         }
 
-        res = new Moment(checkOverflow(config));
-        if (res._nextDay) {
-            // Adding is smart enough around DST
-            res.add(1, 'd');
-            res._nextDay = undefined;
-        }
-
-        return res;
+        return config;
     }
 
     function configFromInput(config) {
@@ -6585,7 +6611,7 @@ function merge_text_nodes( jsonml ) {
         }
         res = moments[0];
         for (i = 1; i < moments.length; ++i) {
-            if (moments[i][fn](res)) {
+            if (!moments[i].isValid() || moments[i][fn](res)) {
                 res = moments[i];
             }
         }
@@ -6697,7 +6723,6 @@ function merge_text_nodes( jsonml ) {
         } else {
             return local__createLocal(input).local();
         }
-        return model._isUTC ? local__createLocal(input).zone(model._offset || 0) : local__createLocal(input).local();
     }
 
     function getDateOffset (m) {
@@ -6797,12 +6822,7 @@ function merge_text_nodes( jsonml ) {
     }
 
     function hasAlignedHourOffset (input) {
-        if (!input) {
-            input = 0;
-        }
-        else {
-            input = local__createLocal(input).utcOffset();
-        }
+        input = input ? local__createLocal(input).utcOffset() : 0;
 
         return (this.utcOffset() - input) % 60 === 0;
     }
@@ -6815,12 +6835,24 @@ function merge_text_nodes( jsonml ) {
     }
 
     function isDaylightSavingTimeShifted () {
-        if (this._a) {
-            var other = this._isUTC ? create_utc__createUTC(this._a) : local__createLocal(this._a);
-            return this.isValid() && compareArrays(this._a, other.toArray()) > 0;
+        if (typeof this._isDSTShifted !== 'undefined') {
+            return this._isDSTShifted;
         }
 
-        return false;
+        var c = {};
+
+        copyConfig(c, this);
+        c = prepareConfig(c);
+
+        if (c._a) {
+            var other = c._isUTC ? create_utc__createUTC(c._a) : local__createLocal(c._a);
+            this._isDSTShifted = this.isValid() &&
+                compareArrays(c._a, other.toArray()) > 0;
+        } else {
+            this._isDSTShifted = false;
+        }
+
+        return this._isDSTShifted;
     }
 
     function isLocal () {
@@ -6980,7 +7012,7 @@ function merge_text_nodes( jsonml ) {
     var add_subtract__add      = createAdder(1, 'add');
     var add_subtract__subtract = createAdder(-1, 'subtract');
 
-    function moment_calendar__calendar (time) {
+    function moment_calendar__calendar (time, formats) {
         // We want to compare the start of today, vs this.
         // Getting start-of-today depends on whether we're local/utc/offset or not.
         var now = time || local__createLocal(),
@@ -6992,7 +7024,7 @@ function merge_text_nodes( jsonml ) {
                 diff < 1 ? 'sameDay' :
                 diff < 2 ? 'nextDay' :
                 diff < 7 ? 'nextWeek' : 'sameElse';
-        return this.format(this.localeData().calendar(format, this, local__createLocal(now)));
+        return this.format(formats && formats[format] || this.localeData().calendar(format, this, local__createLocal(now)));
     }
 
     function clone () {
@@ -7036,14 +7068,6 @@ function merge_text_nodes( jsonml ) {
         } else {
             inputMs = +local__createLocal(input);
             return +(this.clone().startOf(units)) <= inputMs && inputMs <= +(this.clone().endOf(units));
-        }
-    }
-
-    function absFloor (number) {
-        if (number < 0) {
-            return Math.ceil(number);
-        } else {
-            return Math.floor(number);
         }
     }
 
@@ -7237,6 +7261,19 @@ function merge_text_nodes( jsonml ) {
         return [m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second(), m.millisecond()];
     }
 
+    function toObject () {
+        var m = this;
+        return {
+            years: m.year(),
+            months: m.month(),
+            date: m.date(),
+            hours: m.hours(),
+            minutes: m.minutes(),
+            seconds: m.seconds(),
+            milliseconds: m.milliseconds()
+        };
+    }
+
     function moment_valid__isValid () {
         return valid__isValid(this);
     }
@@ -7408,18 +7445,20 @@ function merge_text_nodes( jsonml ) {
     // HELPERS
 
     function parseWeekday(input, locale) {
-        if (typeof input === 'string') {
-            if (!isNaN(input)) {
-                input = parseInt(input, 10);
-            }
-            else {
-                input = locale.weekdaysParse(input);
-                if (typeof input !== 'number') {
-                    return null;
-                }
-            }
+        if (typeof input !== 'string') {
+            return input;
         }
-        return input;
+
+        if (!isNaN(input)) {
+            return parseInt(input, 10);
+        }
+
+        input = locale.weekdaysParse(input);
+        if (typeof input === 'number') {
+            return input;
+        }
+
+        return null;
     }
 
     // LOCALES
@@ -7442,9 +7481,7 @@ function merge_text_nodes( jsonml ) {
     function localeWeekdaysParse (weekdayName) {
         var i, mom, regex;
 
-        if (!this._weekdaysParse) {
-            this._weekdaysParse = [];
-        }
+        this._weekdaysParse = this._weekdaysParse || [];
 
         for (i = 0; i < 7; i++) {
             // make the regex if we don't have it already
@@ -7591,12 +7628,26 @@ function merge_text_nodes( jsonml ) {
         return ~~(this.millisecond() / 10);
     });
 
-    function millisecond__milliseconds (token) {
-        addFormatToken(0, [token, 3], 0, 'millisecond');
-    }
+    addFormatToken(0, ['SSS', 3], 0, 'millisecond');
+    addFormatToken(0, ['SSSS', 4], 0, function () {
+        return this.millisecond() * 10;
+    });
+    addFormatToken(0, ['SSSSS', 5], 0, function () {
+        return this.millisecond() * 100;
+    });
+    addFormatToken(0, ['SSSSSS', 6], 0, function () {
+        return this.millisecond() * 1000;
+    });
+    addFormatToken(0, ['SSSSSSS', 7], 0, function () {
+        return this.millisecond() * 10000;
+    });
+    addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
+        return this.millisecond() * 100000;
+    });
+    addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
+        return this.millisecond() * 1000000;
+    });
 
-    millisecond__milliseconds('SSS');
-    millisecond__milliseconds('SSSS');
 
     // ALIASES
 
@@ -7607,11 +7658,19 @@ function merge_text_nodes( jsonml ) {
     addRegexToken('S',    match1to3, match1);
     addRegexToken('SS',   match1to3, match2);
     addRegexToken('SSS',  match1to3, match3);
-    addRegexToken('SSSS', matchUnsigned);
-    addParseToken(['S', 'SS', 'SSS', 'SSSS'], function (input, array) {
-        array[MILLISECOND] = toInt(('0.' + input) * 1000);
-    });
 
+    var token;
+    for (token = 'SSSS'; token.length <= 9; token += 'S') {
+        addRegexToken(token, matchUnsigned);
+    }
+
+    function parseMs(input, array) {
+        array[MILLISECOND] = toInt(('0.' + input) * 1000);
+    }
+
+    for (token = 'S'; token.length <= 9; token += 'S') {
+        addParseToken(token, parseMs);
+    }
     // MOMENTS
 
     var getSetMillisecond = makeGetSet('Milliseconds', false);
@@ -7658,6 +7717,7 @@ function merge_text_nodes( jsonml ) {
     momentPrototype__proto.startOf      = startOf;
     momentPrototype__proto.subtract     = add_subtract__subtract;
     momentPrototype__proto.toArray      = toArray;
+    momentPrototype__proto.toObject     = toObject;
     momentPrototype__proto.toDate       = toDate;
     momentPrototype__proto.toISOString  = moment_format__toISOString;
     momentPrototype__proto.toJSON       = moment_format__toISOString;
@@ -7757,19 +7817,23 @@ function merge_text_nodes( jsonml ) {
         LT   : 'h:mm A',
         L    : 'MM/DD/YYYY',
         LL   : 'MMMM D, YYYY',
-        LLL  : 'MMMM D, YYYY LT',
-        LLLL : 'dddd, MMMM D, YYYY LT'
+        LLL  : 'MMMM D, YYYY h:mm A',
+        LLLL : 'dddd, MMMM D, YYYY h:mm A'
     };
 
     function longDateFormat (key) {
-        var output = this._longDateFormat[key];
-        if (!output && this._longDateFormat[key.toUpperCase()]) {
-            output = this._longDateFormat[key.toUpperCase()].replace(/MMMM|MM|DD|dddd/g, function (val) {
-                return val.slice(1);
-            });
-            this._longDateFormat[key] = output;
+        var format = this._longDateFormat[key],
+            formatUpper = this._longDateFormat[key.toUpperCase()];
+
+        if (format || !formatUpper) {
+            return format;
         }
-        return output;
+
+        this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function (val) {
+            return val.slice(1);
+        });
+
+        return this._longDateFormat[key];
     }
 
     var defaultInvalidDate = 'Invalid date';
@@ -7978,12 +8042,29 @@ function merge_text_nodes( jsonml ) {
         return duration_add_subtract__addSubtract(this, input, value, -1);
     }
 
+    function absCeil (number) {
+        if (number < 0) {
+            return Math.floor(number);
+        } else {
+            return Math.ceil(number);
+        }
+    }
+
     function bubble () {
         var milliseconds = this._milliseconds;
         var days         = this._days;
         var months       = this._months;
         var data         = this._data;
-        var seconds, minutes, hours, years = 0;
+        var seconds, minutes, hours, years, monthsFromDays;
+
+        // if we have a mix of positive and negative values, bubble down first
+        // check: https://github.com/moment/moment/issues/2166
+        if (!((milliseconds >= 0 && days >= 0 && months >= 0) ||
+                (milliseconds <= 0 && days <= 0 && months <= 0))) {
+            milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
+            days = 0;
+            months = 0;
+        }
 
         // The following code bubbles up values, see the tests for
         // examples of what that means.
@@ -8000,17 +8081,13 @@ function merge_text_nodes( jsonml ) {
 
         days += absFloor(hours / 24);
 
-        // Accurately convert days to years, assume start from year 0.
-        years = absFloor(daysToYears(days));
-        days -= absFloor(yearsToDays(years));
-
-        // 30 days to a month
-        // TODO (iskren): Use anchor date (like 1st Jan) to compute this.
-        months += absFloor(days / 30);
-        days   %= 30;
+        // convert days to months
+        monthsFromDays = absFloor(daysToMonths(days));
+        months += monthsFromDays;
+        days -= absCeil(monthsToDays(monthsFromDays));
 
         // 12 months -> 1 year
-        years  += absFloor(months / 12);
+        years = absFloor(months / 12);
         months %= 12;
 
         data.days   = days;
@@ -8020,15 +8097,15 @@ function merge_text_nodes( jsonml ) {
         return this;
     }
 
-    function daysToYears (days) {
+    function daysToMonths (days) {
         // 400 years have 146097 days (taking into account leap year rules)
-        return days * 400 / 146097;
+        // 400 years have 12 months === 4800
+        return days * 4800 / 146097;
     }
 
-    function yearsToDays (years) {
-        // years * 365 + absFloor(years / 4) -
-        //     absFloor(years / 100) + absFloor(years / 400);
-        return years * 146097 / 400;
+    function monthsToDays (months) {
+        // the reverse of daysToMonths
+        return months * 146097 / 4800;
     }
 
     function as (units) {
@@ -8040,11 +8117,11 @@ function merge_text_nodes( jsonml ) {
 
         if (units === 'month' || units === 'year') {
             days   = this._days   + milliseconds / 864e5;
-            months = this._months + daysToYears(days) * 12;
+            months = this._months + daysToMonths(days);
             return units === 'month' ? months : months / 12;
         } else {
             // handle milliseconds separately because of floating point math errors (issue #1867)
-            days = this._days + Math.round(yearsToDays(this._months / 12));
+            days = this._days + Math.round(monthsToDays(this._months));
             switch (units) {
                 case 'week'   : return days / 7     + milliseconds / 6048e5;
                 case 'day'    : return days         + milliseconds / 864e5;
@@ -8094,7 +8171,7 @@ function merge_text_nodes( jsonml ) {
         };
     }
 
-    var duration_get__milliseconds = makeGetter('milliseconds');
+    var milliseconds = makeGetter('milliseconds');
     var seconds      = makeGetter('seconds');
     var minutes      = makeGetter('minutes');
     var hours        = makeGetter('hours');
@@ -8172,13 +8249,36 @@ function merge_text_nodes( jsonml ) {
     var iso_string__abs = Math.abs;
 
     function iso_string__toISOString() {
+        // for ISO strings we do not use the normal bubbling rules:
+        //  * milliseconds bubble up until they become hours
+        //  * days do not bubble at all
+        //  * months bubble up until they become years
+        // This is because there is no context-free conversion between hours and days
+        // (think of clock changes)
+        // and also not between days and months (28-31 days per month)
+        var seconds = iso_string__abs(this._milliseconds) / 1000;
+        var days         = iso_string__abs(this._days);
+        var months       = iso_string__abs(this._months);
+        var minutes, hours, years;
+
+        // 3600 seconds -> 60 minutes -> 1 hour
+        minutes           = absFloor(seconds / 60);
+        hours             = absFloor(minutes / 60);
+        seconds %= 60;
+        minutes %= 60;
+
+        // 12 months -> 1 year
+        years  = absFloor(months / 12);
+        months %= 12;
+
+
         // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
-        var Y = iso_string__abs(this.years());
-        var M = iso_string__abs(this.months());
-        var D = iso_string__abs(this.days());
-        var h = iso_string__abs(this.hours());
-        var m = iso_string__abs(this.minutes());
-        var s = iso_string__abs(this.seconds() + this.milliseconds() / 1000);
+        var Y = years;
+        var M = months;
+        var D = days;
+        var h = hours;
+        var m = minutes;
+        var s = seconds;
         var total = this.asSeconds();
 
         if (!total) {
@@ -8215,7 +8315,7 @@ function merge_text_nodes( jsonml ) {
     duration_prototype__proto.valueOf        = duration_as__valueOf;
     duration_prototype__proto._bubble        = bubble;
     duration_prototype__proto.get            = duration_get__get;
-    duration_prototype__proto.milliseconds   = duration_get__milliseconds;
+    duration_prototype__proto.milliseconds   = milliseconds;
     duration_prototype__proto.seconds        = seconds;
     duration_prototype__proto.minutes        = minutes;
     duration_prototype__proto.hours          = hours;
@@ -8253,7 +8353,7 @@ function merge_text_nodes( jsonml ) {
     // Side effect imports
 
 
-    utils_hooks__hooks.version = '2.10.3';
+    utils_hooks__hooks.version = '2.10.6';
 
     setHookCallback(local__createLocal);
 
@@ -8331,7 +8431,11 @@ var Dropzone = React.createClass({
 
   propTypes: {
     onDrop: React.PropTypes.func.isRequired,
+    onDragOver: React.PropTypes.func,
+    onDragLeave: React.PropTypes.func,
     size: React.PropTypes.number,
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
     style: React.PropTypes.object,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
@@ -8342,15 +8446,29 @@ var Dropzone = React.createClass({
     this.setState({
       isDragActive: false
     });
+
+    if (this.props.onDragLeave) {
+      this.props.onDragLeave(e);
+    }
   },
 
   onDragOver: function(e) {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
 
-    this.setState({
-      isDragActive: true
-    });
+    // set active drag state only when file is dragged into
+    // (in mozilla when file is dragged effect is "uninitialized")
+    var effectAllowed = e.dataTransfer.effectAllowed;
+    if (effectAllowed === 'all' || effectAllowed === 'uninitialized') {
+      this.setState({
+        isDragActive: true
+      });
+    }
+
+    if (this.props.onDragOver) {
+      this.props.onDragOver(e);
+    }
   },
 
   onDrop: function(e) {
@@ -8391,24 +8509,44 @@ var Dropzone = React.createClass({
   },
 
   render: function() {
-
     var className = this.props.className || 'dropzone';
     if (this.state.isDragActive) {
       className += ' active';
     }
 
-    var style = this.props.style || {
-      width: this.props.size || 100,
-      height: this.props.size || 100,
-      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-    };
-
+    var style = {};
+    if (this.props.style) { // user-defined inline styles take priority
+      style = this.props.style;
+    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
+      style = {
+        width: this.props.width || this.props.size || 100,
+        height: this.props.height || this.props.size || 100,
+        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+      };
+    }
 
     return (
-        React.createElement('div', {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
-            React.createElement('input', {style: {display: 'none'}, type: 'file', multiple: this.props.multiple, ref: 'fileInput', onChange: this.onDrop, accept: this.props.accept}),
-            this.props.children
-        )
+      React.createElement('div',
+        {
+          className: className,
+          style: style,
+          onClick: this.onClick,
+          onDragLeave: this.onDragLeave,
+          onDragOver: this.onDragOver,
+          onDrop: this.onDrop
+        },
+        React.createElement('input',
+          {
+            style: { display: 'none' },
+            type: 'file',
+            multiple: this.props.multiple,
+            ref: 'fileInput',
+            onChange: this.onDrop,
+            accept: this.props.accept
+          }
+        ),
+        this.props.children
+      )
     );
   }
 

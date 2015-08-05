@@ -44,8 +44,8 @@ end
 
 # Add Libraries
 
-# auth library
-gem 'devise_token_auth'
+# auth library (0.1.32 is signin failed)
+gem 'devise_token_auth', '= 0.1.31'
 # setting management library
 gem 'dotenv', '~> 2.0.1'
 # tree model
