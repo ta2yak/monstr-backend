@@ -768,6 +768,7 @@ var markdown = require('markdown').markdown;
 var moment = require('moment');
 
 var PostIndexPage = React.createClass({displayName: "PostIndexPage",
+  mixins: [Router.State],
 
   getInitialState: function() {
     return { post: null, errors: [] };
@@ -775,9 +776,14 @@ var PostIndexPage = React.createClass({displayName: "PostIndexPage",
 
   componentDidMount: function() {
     PostStore.addChangeListener(this._onChange);
-    this.setState({
-        post: PostStore.getPost()
-    });
+
+    if (this.getParams().id) {
+      PostActionCreators.loadPost(this.getParams().id);
+    }else{
+      this.setState({
+          post: PostStore.getPost()
+      });
+    }
   },
 
   componentWillUnmount: function() {
@@ -901,6 +907,7 @@ module.exports = PostIndexPage;
 
 },{"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../components/common/ErrorNotice.react.jsx":11,"../../components/common/SuccessNotice.react.jsx":12,"../../components/post/IndexTree.react.jsx":15,"../../stores/PostStore.react.jsx":25,"../../stores/SessionStore.react.jsx":27,"markdown":37,"moment":39,"react":234,"react-router":66}],15:[function(require,module,exports){
 var React = require('react');
+var Router = require('react-router');
 
 var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var IndexActionCreators = require('../../actions/IndexActionCreators.react.jsx');
@@ -911,6 +918,8 @@ var IndexStore = require('../../stores/IndexStore.react.jsx');
 var PostStore = require('../../stores/PostStore.react.jsx');
 
 var PostIndexTree = React.createClass({displayName: "PostIndexTree",
+  mixins: [Router.State],
+
   getInitialState: function() {
       return {data: [], currentPost: {}};
   },
@@ -919,9 +928,9 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
     PostStore.addChangeListener(this._onPostChange);
     IndexStore.addChangeListener(this._onIndexChange);
     IndexActionCreators.loadIndex();
-    this.setState({
-        currentPost: PostStore.getPost()
-    });
+    if (this.getParams().id) {
+      PostActionCreators.loadPost(this.getParams().id);
+    }
   },
 
   componentWillUnmount: function() {
@@ -941,15 +950,21 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
     });
   },
 
+  _getSelectedPostId: function(){
+    if (this.getParams().id) return this.getParams().id;
+    if (this.state.currentPost) return this.state.currentPost.id;
+    return null;
+  },
+
   _genNode: function(nodes){
 
-    var selectedPostID = this.state.currentPost ? this.state.currentPost.id : null;
+    var selectedPostID = this._getSelectedPostId();
 
     var navTree = function(nodes, depth){
 
       var onSelect = function(id){
         PostActionCreators.loadPost(id);
-      }
+      };
 
       var indents = [];
       for (var i = 0; i < depth - 1; i++) {
@@ -1022,7 +1037,7 @@ var PostIndexTree = React.createClass({displayName: "PostIndexTree",
 
 module.exports = PostIndexTree;
 
-},{"../../actions/IndexActionCreators.react.jsx":2,"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../stores/IndexStore.react.jsx":24,"../../stores/PostStore.react.jsx":25,"../../stores/SessionStore.react.jsx":27,"react":234}],16:[function(require,module,exports){
+},{"../../actions/IndexActionCreators.react.jsx":2,"../../actions/PostActionCreators.react.jsx":3,"../../actions/RouteActionCreators.react.jsx":4,"../../stores/IndexStore.react.jsx":24,"../../stores/PostStore.react.jsx":25,"../../stores/SessionStore.react.jsx":27,"react":234,"react-router":66}],16:[function(require,module,exports){
 var React = require('react');
 var RouteActionCreators = require('../../actions/RouteActionCreators.react.jsx');
 var PostActionCreators = require('../../actions/PostActionCreators.react.jsx');
@@ -1664,6 +1679,7 @@ module.exports = (
     React.createElement(Route, {name: "new-post", path: "/post/new", handler: PostNewPage}), 
     React.createElement(Route, {name: "edit-post", path: "/post/edit", handler: PostEditPage}), 
     React.createElement(Route, {name: "posts", path: "/posts", handler: PostsPage}), 
+    React.createElement(Route, {name: "posts_with_item", path: "/posts/:id?", handler: PostsPage}), 
     React.createElement(Route, {name: "edit-user", path: "/user/edit", handler: UserEditPage})
 )
 );
@@ -1909,6 +1925,10 @@ RouteStore.dispatchToken = MonstrAppDispatcher.register(function(payload) {
 
     case ActionTypes.REDIRECT:
       router.transitionTo(action.route)
+      break;
+
+    case ActionTypes.LOAD_POST:
+      router.transitionTo("posts_with_item", {id: action.postId})
       break;
 
     // case ActionTypes.LOGIN_RESPONSE:
